@@ -20,7 +20,7 @@ class HomeScreen extends ConsumerWidget {
         title: RichText(
           text: const TextSpan(children: [
             TextSpan(
-                text: 'Prono',
+                text: 'ProScores',
                 style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 20,
