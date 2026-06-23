@@ -13,7 +13,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final matches = ref.watch(upcomingMatchesProvider);
+    final matches = ref.watch(worldCupFixturesProvider);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.dark,
@@ -38,7 +38,7 @@ class HomeScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => ErrorRetry(
             message: 'Impossible de charger les matchs.\n$e',
-            onRetry: () => ref.invalidate(upcomingMatchesProvider)),
+            onRetry: () => ref.invalidate(worldCupFixturesProvider)),
         data: (list) => _MatchList(list),
       ),
       bottomNavigationBar: SafeArea(
@@ -137,10 +137,54 @@ class _MatchRow extends StatelessWidget {
                 ],
               ),
             ),
+            _Favorite(match),
+            const SizedBox(width: 6),
             const Icon(Icons.chevron_right, color: AppColors.muted),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Shows the most probable 1X2 outcome (percentage + short label).
+class _Favorite extends StatelessWidget {
+  const _Favorite(this.match);
+  final MatchFixture match;
+  @override
+  Widget build(BuildContext context) {
+    if (match.markets.isEmpty) return const SizedBox.shrink();
+    final selections = match.markets.first.selections;
+    var bestIndex = 0;
+    for (var i = 1; i < selections.length; i++) {
+      if (selections[i].adjustedProbability >
+          selections[bestIndex].adjustedProbability) {
+        bestIndex = i;
+      }
+    }
+    final best = selections[bestIndex];
+    final label = switch (bestIndex) {
+      0 => match.home.name,
+      1 => 'Nul',
+      _ => match.away.name,
+    };
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text('${(best.adjustedProbability * 100).round()}%',
+            style: const TextStyle(
+                color: AppColors.teal,
+                fontWeight: FontWeight.w700,
+                fontSize: 15)),
+        SizedBox(
+          width: 70,
+          child: Text(label,
+              textAlign: TextAlign.end,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: AppColors.muted, fontSize: 9)),
+        ),
+      ],
     );
   }
 }

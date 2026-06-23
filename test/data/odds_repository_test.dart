@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
+import 'package:proscores/data/football_repository.dart' show ApiException;
 import 'package:proscores/data/odds_repository.dart';
 
 class _MockClient extends Mock implements http.Client {}
@@ -9,10 +10,12 @@ class _MockClient extends Mock implements http.Client {}
 void main() {
   setUpAll(() => registerFallbackValue(Uri()));
 
-  test('extracts 1x2 odds for the matching game', () async {
+  test('parses events with h2h odds ordered [home, draw, away]', () async {
     final client = _MockClient();
     final body = jsonEncode([
       {
+        'id': '8ba93d190f1f934e33862a97a6353a6e',
+        'commence_time': '2026-06-23T17:00:00Z',
         'home_team': 'France',
         'away_team': 'Brazil',
         'bookmakers': [
@@ -35,18 +38,41 @@ void main() {
         .thenAnswer((_) async => http.Response(body, 200));
 
     final repo = HttpOddsRepository(client);
-    final odds = await repo.marketOddsFor('France', 'Brazil');
+    final events = await repo.fetchWorldCupEvents();
 
-    // ordered home, draw, away
-    expect(odds['1x2'], [2.10, 3.40, 3.05]);
+    expect(events, hasLength(1));
+    final e = events.first;
+    expect(e.id, '8ba93d190f1f934e33862a97a6353a6e');
+    expect(e.homeTeam, 'France');
+    expect(e.awayTeam, 'Brazil');
+    expect(e.commenceTime.toUtc().hour, 17);
+    expect(e.h2h, [2.10, 3.40, 3.05]); // home, draw, away
   });
 
-  test('returns empty map when no game matches', () async {
+  test('keeps event but leaves h2h null when no bookmaker odds', () async {
+    final client = _MockClient();
+    final body = jsonEncode([
+      {
+        'id': 'abc',
+        'commence_time': '2026-06-24T18:00:00Z',
+        'home_team': 'Spain',
+        'away_team': 'Japan',
+        'bookmakers': <dynamic>[],
+      }
+    ]);
+    when(() => client.get(any(), headers: any(named: 'headers')))
+        .thenAnswer((_) async => http.Response(body, 200));
+
+    final repo = HttpOddsRepository(client);
+    final events = await repo.fetchWorldCupEvents();
+    expect(events.single.h2h, isNull);
+  });
+
+  test('throws on non-200', () async {
     final client = _MockClient();
     when(() => client.get(any(), headers: any(named: 'headers')))
-        .thenAnswer((_) async => http.Response('[]', 200));
+        .thenAnswer((_) async => http.Response('nope', 401));
     final repo = HttpOddsRepository(client);
-    final odds = await repo.marketOddsFor('France', 'Brazil');
-    expect(odds, isEmpty);
+    expect(repo.fetchWorldCupEvents(), throwsA(isA<ApiException>()));
   });
 }

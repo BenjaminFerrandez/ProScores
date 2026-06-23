@@ -3,7 +3,6 @@ import '../models/combo.dart';
 import '../models/risk_level.dart';
 import '../services/combo_generator.dart';
 import 'matches_provider.dart';
-import 'match_detail_provider.dart';
 
 class ComboRequest {
   final double stake;
@@ -25,12 +24,11 @@ class ComboRequest {
 
 final comboProvider =
     FutureProvider.family<List<Combo>, ComboRequest>((ref, req) async {
-  final fixtures = await ref.watch(upcomingMatchesProvider.future);
+  final fixtures = await ref.watch(worldCupFixturesProvider.future);
   // Build a candidate pool from each fixture's 1X2 selections.
   final pool = <CandidateBet>[];
   for (final f in fixtures) {
-    final detail = await ref.watch(matchDetailProvider(f.id).future);
-    for (final market in detail.markets) {
+    for (final market in f.markets) {
       for (final sel in market.selections) {
         pool.add(CandidateBet(
             matchId: f.id, matchLabel: f.label, selection: sel));
