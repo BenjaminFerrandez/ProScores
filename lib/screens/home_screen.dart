@@ -5,6 +5,7 @@ import '../config/theme.dart';
 import '../models/match_fixture.dart';
 import '../providers/matches_provider.dart';
 import '../widgets/error_retry.dart';
+import 'account_screen.dart';
 import 'create_prono_screen.dart';
 import 'match_detail_screen.dart';
 
@@ -33,13 +34,29 @@ class HomeScreen extends ConsumerWidget {
                     color: AppColors.teal)),
           ]),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.account_circle_outlined),
+            tooltip: 'Mon compte',
+            onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AccountScreen())),
+          ),
+        ],
       ),
-      body: matches.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => ErrorRetry(
-            message: 'Impossible de charger les matchs.\n$e',
-            onRetry: () => ref.invalidate(worldCupFixturesProvider)),
-        data: (list) => _MatchList(list),
+      body: RefreshIndicator(
+        color: AppColors.teal,
+        backgroundColor: AppColors.card,
+        onRefresh: () async {
+          ref.invalidate(worldCupFixturesProvider);
+          await ref.read(worldCupFixturesProvider.future);
+        },
+        child: matches.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => ErrorRetry(
+              message: 'Impossible de charger les matchs.\n$e',
+              onRetry: () => ref.invalidate(worldCupFixturesProvider)),
+          data: (list) => _MatchList(list),
+        ),
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
@@ -67,9 +84,17 @@ class _MatchList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (matches.isEmpty) {
-      return const Center(
-          child: Text('Aucun match à venir.',
-              style: TextStyle(color: AppColors.muted)));
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          Padding(
+            padding: EdgeInsets.only(top: 120),
+            child: Center(
+                child: Text('Aucun match à venir.',
+                    style: TextStyle(color: AppColors.muted))),
+          ),
+        ],
+      );
     }
     // group by calendar day
     final byDay = <String, List<MatchFixture>>{};
@@ -79,6 +104,7 @@ class _MatchList extends StatelessWidget {
     }
     final days = byDay.keys.toList();
     return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 14),
       itemCount: days.length,
       itemBuilder: (_, i) {

@@ -8,6 +8,7 @@ import '../providers/match_detail_provider.dart';
 import '../widgets/error_retry.dart';
 import '../widgets/probability_bar.dart';
 import '../widgets/responsible_gaming_note.dart';
+import 'match_stats_screen.dart';
 
 class MatchDetailScreen extends ConsumerWidget {
   const MatchDetailScreen({super.key, required this.fixtureId});
@@ -61,6 +62,18 @@ class MatchDetailScreen extends ConsumerWidget {
                     style: TextStyle(color: AppColors.muted)),
               ),
             ...match.markets.map((m) => _MarketCard(m)),
+            const SizedBox(height: 4),
+            OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => MatchStatsScreen(fixtureId: fixtureId))),
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.teal,
+                  side: const BorderSide(color: AppColors.teal),
+                  minimumSize: const Size.fromHeight(48)),
+              icon: const Icon(Icons.bar_chart_rounded, size: 20),
+              label: const Text('Stats & historique des équipes',
+                  style: TextStyle(fontWeight: FontWeight.w700)),
+            ),
             const ResponsibleGamingNote(),
           ],
         ),

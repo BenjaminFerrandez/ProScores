@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../config/country_names.dart';
 import '../models/market.dart';
 import '../models/match_fixture.dart';
 import '../models/team.dart';
@@ -42,8 +43,10 @@ final worldCupFixturesProvider =
       id: stableFixtureId(e.id),
       competition: 'Coupe du Monde',
       kickoff: e.commenceTime,
-      home: Team(id: 0, name: e.homeTeam),
-      away: Team(id: 0, name: e.awayTeam),
+      home: Team(
+          id: 0, name: frCountry(e.homeTeam), searchName: e.homeTeam),
+      away: Team(
+          id: 0, name: frCountry(e.awayTeam), searchName: e.awayTeam),
       markets: markets,
     ));
   }

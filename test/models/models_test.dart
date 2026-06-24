@@ -25,6 +25,7 @@ void main() {
     const leg = ComboLeg(
       matchId: 1,
       matchLabel: 'France - Brésil',
+      market: MarketType.resultat1x2,
       selection:
           Selection(label: 'France', odd: 2.1, adjustedProbability: 0.48),
     );
