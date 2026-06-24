@@ -87,7 +87,8 @@ class _WobbleButtonState extends State<WobbleButton> {
 }
 
 /// Small square button using the square SVG background with a centered icon.
-class SquareIconButton extends StatelessWidget {
+/// The lighter front face + icon slide toward the shadow on press.
+class SquareIconButton extends StatefulWidget {
   const SquareIconButton({
     super.key,
     required this.icon,
@@ -100,20 +101,52 @@ class SquareIconButton extends StatelessWidget {
   final double size;
 
   @override
+  State<SquareIconButton> createState() => _SquareIconButtonState();
+}
+
+class _SquareIconButtonState extends State<SquareIconButton> {
+  bool _pressed = false;
+
+  @override
   Widget build(BuildContext context) {
+    final enabled = widget.onPressed != null;
     return GestureDetector(
-      onTap: onPressed,
       behavior: HitTestBehavior.opaque,
+      onTapDown: enabled ? (_) => setState(() => _pressed = true) : null,
+      onTapUp: enabled
+          ? (_) {
+              setState(() => _pressed = false);
+              widget.onPressed!();
+            }
+          : null,
+      onTapCancel: () => setState(() => _pressed = false),
       child: SizedBox(
-        height: size,
-        width: size,
+        height: widget.size,
+        width: widget.size,
         child: Stack(
-          alignment: Alignment.center,
           children: [
             Positioned.fill(
-              child: SvgPicture.asset(Assets.buttonSquare, fit: BoxFit.fill),
+              child:
+                  SvgPicture.asset(Assets.buttonSquareBack, fit: BoxFit.fill),
             ),
-            Icon(icon, color: Colors.white, size: size * 0.5),
+            Positioned.fill(
+              child: AnimatedSlide(
+                offset: _pressed ? const Offset(0.08, 0.10) : Offset.zero,
+                duration: const Duration(milliseconds: 90),
+                curve: Curves.easeOut,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Positioned.fill(
+                      child: SvgPicture.asset(Assets.buttonSquareFront,
+                          fit: BoxFit.fill),
+                    ),
+                    Icon(widget.icon,
+                        color: Colors.white, size: widget.size * 0.5),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
