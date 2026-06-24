@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import '../config/assets.dart';
 import '../config/theme.dart';
 import '../models/match_fixture.dart';
 import '../utils/team_flags.dart';
@@ -35,7 +37,17 @@ class MatchRow extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: TimeChip(time),
+              child: SizedBox(
+                width: 56,
+                height: 44,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SvgPicture.asset(Assets.dividerSquiggle, height: 44),
+                    TimeChip(time),
+                  ],
+                ),
+              ),
             ),
             Expanded(
               child: Text(match.away.name,
