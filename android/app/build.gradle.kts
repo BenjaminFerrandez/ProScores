@@ -8,8 +8,10 @@ plugins {
 android {
     namespace = "com.proscores.proscores"
     compileSdk = flutter.compileSdkVersion
-    // path_provider_android (transitive dep) requires NDK 27; pin it explicitly.
-    ndkVersion = "27.0.12077973"
+    // Use Flutter's default NDK. (Pinning NDK 27 triggers a CMake compiler-
+    // detection failure on Windows; the NDK 27 "requirement" from
+    // path_provider_android is only a backward-compatible warning.)
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

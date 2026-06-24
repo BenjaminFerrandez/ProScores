@@ -5,9 +5,11 @@ import '../config/theme.dart';
 import '../models/market.dart';
 import '../models/risk_level.dart';
 import '../providers/match_detail_provider.dart';
+import '../utils/team_flags.dart';
 import '../widgets/error_retry.dart';
 import '../widgets/probability_bar.dart';
 import '../widgets/responsible_gaming_note.dart';
+import '../widgets/wobble_button.dart';
 
 class MatchDetailScreen extends ConsumerWidget {
   const MatchDetailScreen({super.key, required this.fixtureId});
@@ -17,7 +19,18 @@ class MatchDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final detail = ref.watch(matchDetailProvider(fixtureId));
     return Scaffold(
-      appBar: AppBar(backgroundColor: AppColors.dark),
+      appBar: AppBar(
+        backgroundColor: AppColors.dark,
+        leadingWidth: 60,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: Center(
+            child: SquareIconButton(
+                icon: Icons.arrow_back,
+                onPressed: () => Navigator.of(context).pop()),
+          ),
+        ),
+      ),
       body: detail.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => ErrorRetry(
@@ -42,14 +55,11 @@ class MatchDetailScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(match.home.name,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 16)),
+                _HeaderTeam(name: match.home.name),
                 const Text('VS', style: TextStyle(color: AppColors.muted)),
-                Text(match.away.name,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 16)),
+                _HeaderTeam(name: match.away.name),
               ],
             ),
             const SizedBox(height: 20),
@@ -134,6 +144,29 @@ class _RiskTag extends StatelessWidget {
       child: Text(risk.label,
           style: TextStyle(
               color: color, fontSize: 9, fontWeight: FontWeight.w600)),
+    );
+  }
+}
+
+class _HeaderTeam extends StatelessWidget {
+  const _HeaderTeam({required this.name});
+  final String name;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 110,
+      child: Column(
+        children: [
+          TeamFlag(name, height: 40),
+          const SizedBox(height: 8),
+          Text(name,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                  fontWeight: FontWeight.w700, fontSize: 15)),
+        ],
+      ),
     );
   }
 }

@@ -6,6 +6,7 @@ import '../models/risk_level.dart';
 import '../providers/combo_provider.dart';
 import '../widgets/error_retry.dart';
 import '../widgets/responsible_gaming_note.dart';
+import '../widgets/wobble_button.dart';
 
 class CreatePronoScreen extends ConsumerStatefulWidget {
   const CreatePronoScreen({super.key});
@@ -42,6 +43,15 @@ class _CreatePronoScreenState extends ConsumerState<CreatePronoScreen> {
     return Scaffold(
       appBar: AppBar(
           backgroundColor: AppColors.dark,
+          leadingWidth: 60,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: Center(
+              child: SquareIconButton(
+                  icon: Icons.arrow_back,
+                  onPressed: () => Navigator.of(context).pop()),
+            ),
+          ),
           title: const Text('Crée ton prono')),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -72,13 +82,9 @@ class _CreatePronoScreenState extends ConsumerState<CreatePronoScreen> {
           _RiskSelector(
               value: _risk, onChanged: (r) => setState(() => _risk = r)),
           const SizedBox(height: 16),
-          FilledButton(
-            style: FilledButton.styleFrom(
-                backgroundColor: AppColors.teal,
-                minimumSize: const Size.fromHeight(52)),
+          WobbleButton(
+            label: 'Générer mes combinés',
             onPressed: _stakeVal > 0 && _targetVal > 0 ? _submit : null,
-            child: const Text('Générer mes combinés',
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           ),
           const ResponsibleGamingNote(),
           if (_request != null) _Results(request: _request!),
