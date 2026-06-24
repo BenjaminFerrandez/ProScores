@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../config/assets.dart';
 
-/// Full-width call-to-action using the hand-drawn rectangle SVG as background,
-/// with a centered label on top.
-class WobbleButton extends StatelessWidget {
+/// Full-width call-to-action using the hand-drawn rectangle SVG. The lighter
+/// front face (and label) slides toward the shadow on press for a tactile feel.
+class WobbleButton extends StatefulWidget {
   const WobbleButton({
     super.key,
     required this.label,
@@ -17,33 +17,64 @@ class WobbleButton extends StatelessWidget {
   final double height;
 
   @override
+  State<WobbleButton> createState() => _WobbleButtonState();
+}
+
+class _WobbleButtonState extends State<WobbleButton> {
+  bool _pressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    final enabled = onPressed != null;
+    final enabled = widget.onPressed != null;
     return Opacity(
       opacity: enabled ? 1 : 0.5,
       child: GestureDetector(
-        onTap: onPressed,
         behavior: HitTestBehavior.opaque,
+        onTapDown: enabled ? (_) => setState(() => _pressed = true) : null,
+        onTapUp: enabled
+            ? (_) {
+                setState(() => _pressed = false);
+                widget.onPressed!();
+              }
+            : null,
+        onTapCancel: () => setState(() => _pressed = false),
         child: SizedBox(
-          height: height,
+          height: widget.height,
           width: double.infinity,
           child: Stack(
-            alignment: Alignment.center,
             children: [
+              // Fixed shadow / back face.
               Positioned.fill(
-                child: SvgPicture.asset(Assets.buttonRectangle,
+                child: SvgPicture.asset(Assets.buttonRectangleBack,
                     fit: BoxFit.fill),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  label.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 17,
-                    letterSpacing: 0.5,
+              // Lighter front face + label, slides toward the shadow on press.
+              Positioned.fill(
+                child: AnimatedSlide(
+                  offset: _pressed ? const Offset(0.015, 0.07) : Offset.zero,
+                  duration: const Duration(milliseconds: 90),
+                  curve: Curves.easeOut,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Positioned.fill(
+                        child: SvgPicture.asset(Assets.buttonRectangleFront,
+                            fit: BoxFit.fill),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          widget.label.toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 17,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

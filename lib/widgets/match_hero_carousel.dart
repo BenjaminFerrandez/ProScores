@@ -45,15 +45,15 @@ class _MatchHeroCarouselState extends State<MatchHeroCarousel> {
           Positioned(
             top: 0,
             left: 0,
-            child: SvgPicture.asset(Assets.triangleTopMatch, width: 90),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
             child: RotatedBox(
               quarterTurns: 2,
               child: SvgPicture.asset(Assets.triangleTopMatch, width: 90),
             ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: SvgPicture.asset(Assets.triangleTopMatch, width: 90),
           ),
           Column(
             children: [
@@ -77,10 +77,11 @@ class _MatchHeroCarouselState extends State<MatchHeroCarousel> {
                     for (var i = 0; i < items.length; i++)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Opacity(
-                          opacity: i == _index ? 1 : 0.4,
-                          child: SvgPicture.asset(Assets.carouselDot,
-                              width: i == _index ? 10 : 8),
+                        child: SvgPicture.asset(
+                          i == _index
+                              ? Assets.carouselDot
+                              : Assets.carouselDotEmpty,
+                          width: 9,
                         ),
                       ),
                   ],
