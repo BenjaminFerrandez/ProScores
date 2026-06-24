@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import '../config/assets.dart';
 import '../config/theme.dart';
 import '../models/match_fixture.dart';
 import 'team_crest.dart';
+import 'time_chip.dart';
 
-/// Swipeable hero carousel featuring the next few upcoming matches, with a
-/// dot indicator. Tapping a slide invokes [onTapMatch].
+/// Swipeable hero carousel featuring the next few upcoming matches, on a dark
+/// card with teal corner triangles and SVG dot indicators.
 class MatchHeroCarousel extends StatefulWidget {
   const MatchHeroCarousel({
     super.key,
@@ -33,86 +36,99 @@ class _MatchHeroCarouselState extends State<MatchHeroCarousel> {
   Widget build(BuildContext context) {
     final items = widget.matches.take(4).toList();
     if (items.isEmpty) return const SizedBox.shrink();
-    return Column(
-      children: [
-        SizedBox(
-          height: 170,
-          child: PageView.builder(
-            controller: _controller,
-            itemCount: items.length,
-            onPageChanged: (i) => setState(() => _index = i),
-            itemBuilder: (_, i) => _HeroCard(
-              match: items[i],
-              onTap: () => widget.onTapMatch(items[i]),
+    return Container(
+      height: 240,
+      color: AppColors.card,
+      child: Stack(
+        children: [
+          // Corner triangles.
+          Positioned(
+            top: 0,
+            left: 0,
+            child: SvgPicture.asset(Assets.triangleTopMatch, width: 90),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: RotatedBox(
+              quarterTurns: 2,
+              child: SvgPicture.asset(Assets.triangleTopMatch, width: 90),
             ),
           ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            for (var i = 0; i < items.length; i++)
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                width: i == _index ? 18 : 7,
-                height: 7,
-                color: i == _index ? AppColors.teal : AppColors.muted,
+          Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  controller: _controller,
+                  itemCount: items.length,
+                  onPageChanged: (i) => setState(() => _index = i),
+                  itemBuilder: (_, i) => GestureDetector(
+                    onTap: () => widget.onTapMatch(items[i]),
+                    behavior: HitTestBehavior.opaque,
+                    child: _HeroContent(match: items[i]),
+                  ),
+                ),
               ),
-          ],
-        ),
-      ],
+              Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (var i = 0; i < items.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Opacity(
+                          opacity: i == _index ? 1 : 0.4,
+                          child: SvgPicture.asset(Assets.carouselDot,
+                              width: i == _index ? 10 : 8),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _HeroCard extends StatelessWidget {
-  const _HeroCard({required this.match, required this.onTap});
+class _HeroContent extends StatelessWidget {
+  const _HeroContent({required this.match});
   final MatchFixture match;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final when =
         DateFormat("EEE d MMM · HH:mm", 'fr_FR').format(match.kickoff.toLocal());
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF063D2E), Color(0xFF049F7C)],
+    final time = DateFormat('HH:mm').format(match.kickoff.toLocal());
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      child: Column(
+        children: [
+          Text(match.competition.toUpperCase(),
+              style: const TextStyle(
+                  color: AppColors.muted,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 10,
+                  letterSpacing: 1.2)),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(child: _Side(name: match.home.name)),
+              TimeChip(time, height: 34),
+              Expanded(child: _Side(name: match.away.name)),
+            ],
           ),
-        ),
-        child: Column(
-          children: [
-            Text(match.competition.toUpperCase(),
-                style: const TextStyle(
-                    color: Colors.white70,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 10,
-                    letterSpacing: 1.2)),
-            const SizedBox(height: 14),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _Side(name: match.home.name),
-                const Text('VS',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16)),
-                _Side(name: match.away.name),
-              ],
-            ),
-            const Spacer(),
-            Text(when,
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12)),
-          ],
-        ),
+          const Spacer(),
+          Text(when,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12)),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }
@@ -123,22 +139,19 @@ class _Side extends StatelessWidget {
   final String name;
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 96,
-      child: Column(
-        children: [
-          TeamCrest(name, size: 48),
-          const SizedBox(height: 8),
-          Text(name,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13)),
-        ],
-      ),
+    return Column(
+      children: [
+        TeamCrest(name, size: 48),
+        const SizedBox(height: 8),
+        Text(name,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 14)),
+      ],
     );
   }
 }

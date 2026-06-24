@@ -4,4 +4,6 @@ class Assets {
   static const buttonRectangle = 'assets/buttons/bouton_rectangle.svg';
   static const buttonSquare = 'assets/buttons/square_button.svg';
   static const caseTemps = 'assets/buttons/case_temps.svg';
+  static const carouselDot = 'assets/buttons/carrousel_dot.svg';
+  static const triangleTopMatch = 'assets/buttons/triangle_top_match.svg';
 }

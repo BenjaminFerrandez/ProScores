@@ -5,7 +5,7 @@ class AppColors {
   static const dark = Color(0xFF202322);
   static const light = Color(0xFFF3F9F8);
   static const teal = Color(0xFF049F7C);
-  static const card = Color(0xFF262B2A);
+  static const card = Color(0xFF3A3F3E);
   static const muted = Color(0xFF9BB3AD);
 }
 
