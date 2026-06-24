@@ -40,19 +40,20 @@ class _MatchHeroCarouselState extends State<MatchHeroCarousel> {
       height: 240,
       color: AppColors.card,
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          // Corner triangles.
+          // Corner triangles, sticking slightly out of the card.
           Positioned(
-            top: 0,
-            left: 0,
+            top: -9,
+            left: -9,
             child: RotatedBox(
               quarterTurns: 2,
               child: SvgPicture.asset(Assets.triangleTopMatch, width: 90),
             ),
           ),
           Positioned(
-            bottom: 0,
-            right: 0,
+            bottom: -9,
+            right: -9,
             child: SvgPicture.asset(Assets.triangleTopMatch, width: 90),
           ),
           Column(

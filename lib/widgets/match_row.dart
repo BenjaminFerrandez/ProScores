@@ -7,8 +7,8 @@ import '../models/match_fixture.dart';
 import '../utils/team_flags.dart';
 import 'time_chip.dart';
 
-/// Compact upcoming-match row: flag · team · time chip (over a full-height
-/// wavy divider) · team · flag.
+/// Compact upcoming-match row: flags + team names, a full-height wavy divider,
+/// and the kickoff-time chip straddling the bottom edge of the card.
 class MatchRow extends StatelessWidget {
   const MatchRow({super.key, required this.match, required this.onTap});
   final MatchFixture match;
@@ -21,11 +21,12 @@ class MatchRow extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 18),
         color: AppColors.card,
         child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            // Full-height wavy divider, centered behind the time chip.
+            // Full-height wavy divider, centered.
             Positioned.fill(
               child: Center(
                 child: SvgPicture.asset(Assets.dividerSquiggle,
@@ -33,7 +34,7 @@ class MatchRow extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               child: Row(
                 children: [
                   TeamFlag(match.home.name, height: 26),
@@ -46,10 +47,7 @@ class MatchRow extends StatelessWidget {
                         style: const TextStyle(
                             fontWeight: FontWeight.w700, fontSize: 13)),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: TimeChip(time),
-                  ),
+                  const SizedBox(width: 30),
                   Expanded(
                     child: Text(match.away.name,
                         textAlign: TextAlign.center,
@@ -62,6 +60,13 @@ class MatchRow extends StatelessWidget {
                   TeamFlag(match.away.name, height: 26),
                 ],
               ),
+            ),
+            // Kickoff time straddling the bottom edge of the card.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: -13,
+              child: Center(child: TimeChip(time)),
             ),
           ],
         ),
