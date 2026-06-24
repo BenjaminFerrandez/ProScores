@@ -16,6 +16,9 @@ class ApiException implements Exception {
 abstract class FootballRepository {
   Future<List<MatchFixture>> upcomingWorldCupFixtures();
   Future<Prediction> predictionFor(int fixtureId);
+
+  /// Logo (crest) URL for a national team given its name, or null if unknown.
+  Future<String?> nationalTeamLogo(String teamName);
 }
 
 class HttpFootballRepository implements FootballRepository {
@@ -24,6 +27,23 @@ class HttpFootballRepository implements FootballRepository {
 
   static const _base = 'https://v3.football.api-sports.io';
   Map<String, String> get _headers => {'x-apisports-key': footballApiKey};
+
+  @override
+  Future<String?> nationalTeamLogo(String teamName) async {
+    final uri = Uri.parse('$_base/teams?search=${Uri.encodeQueryComponent(teamName)}');
+    final res = await client.get(uri, headers: _headers);
+    if (res.statusCode != 200) return null;
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    final list = (data['response'] as List?)?.cast<Map<String, dynamic>>() ??
+        const [];
+    if (list.isEmpty) return null;
+    // Prefer the national team; fall back to the first result.
+    final match = list.firstWhere(
+      (t) => (t['team'] as Map<String, dynamic>)['national'] == true,
+      orElse: () => list.first,
+    );
+    return (match['team'] as Map<String, dynamic>)['logo'] as String?;
+  }
 
   @override
   Future<List<MatchFixture>> upcomingWorldCupFixtures() async {

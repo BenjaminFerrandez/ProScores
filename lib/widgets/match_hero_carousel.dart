@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../config/theme.dart';
 import '../models/match_fixture.dart';
-import '../utils/team_flags.dart';
+import 'team_crest.dart';
 
 /// Swipeable hero carousel featuring the next few upcoming matches, with a
 /// dot indicator. Tapping a slide invokes [onTapMatch].
@@ -56,10 +56,7 @@ class _MatchHeroCarouselState extends State<MatchHeroCarousel> {
                 margin: const EdgeInsets.symmetric(horizontal: 3),
                 width: i == _index ? 18 : 7,
                 height: 7,
-                decoration: BoxDecoration(
-                  color: i == _index ? AppColors.teal : AppColors.muted,
-                  borderRadius: BorderRadius.circular(4),
-                ),
+                color: i == _index ? AppColors.teal : AppColors.muted,
               ),
           ],
         ),
@@ -83,7 +80,6 @@ class _HeroCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -131,7 +127,7 @@ class _Side extends StatelessWidget {
       width: 96,
       child: Column(
         children: [
-          TeamFlag(name, height: 34),
+          TeamCrest(name, size: 48),
           const SizedBox(height: 8),
           Text(name,
               textAlign: TextAlign.center,

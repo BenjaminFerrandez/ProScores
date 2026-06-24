@@ -26,6 +26,15 @@ ThemeData buildAppTheme() {
       titleSmall: GoogleFonts.outfit(
           fontWeight: FontWeight.w700, color: AppColors.light),
     ),
+    // Sharp, square corners everywhere.
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+    ),
   );
 }
 

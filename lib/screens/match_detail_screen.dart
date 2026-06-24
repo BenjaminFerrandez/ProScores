@@ -90,7 +90,7 @@ class _MarketCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-          color: AppColors.card, borderRadius: BorderRadius.circular(14)),
+          color: AppColors.card),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -139,8 +139,7 @@ class _RiskTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.18),
-          borderRadius: BorderRadius.circular(10)),
+          color: color.withValues(alpha: 0.18)),
       child: Text(risk.label,
           style: TextStyle(
               color: color, fontSize: 9, fontWeight: FontWeight.w600)),

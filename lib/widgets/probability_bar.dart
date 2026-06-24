@@ -19,7 +19,7 @@ class ProbabilityBar extends StatelessWidget {
                 height: 18,
                 decoration: BoxDecoration(
                   color: AppColors.dark,
-                  borderRadius: BorderRadius.circular(9),
+                  borderRadius: BorderRadius.zero,
                 ),
               ),
               FractionallySizedBox(
@@ -28,7 +28,7 @@ class ProbabilityBar extends StatelessWidget {
                   height: 18,
                   decoration: BoxDecoration(
                     color: AppColors.teal,
-                    borderRadius: BorderRadius.circular(9),
+                    borderRadius: BorderRadius.zero,
                   ),
                 ),
               ),

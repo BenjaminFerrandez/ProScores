@@ -140,7 +140,6 @@ class _ComboCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(14),
         border: Border.all(
             color: best ? AppColors.teal : const Color(0xFF313837)),
       ),
@@ -214,8 +213,8 @@ class _NumberField extends StatelessWidget {
             decoration: InputDecoration(
               filled: true,
               fillColor: AppColors.card,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+              border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
                   borderSide: BorderSide.none),
             ),
           ),
@@ -240,10 +239,7 @@ class _RiskSelector extends StatelessWidget {
                 onTap: () => onChanged(r),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: value == r ? AppColors.teal : AppColors.card,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  color: value == r ? AppColors.teal : AppColors.card,
                   child: Text(r.label,
                       textAlign: TextAlign.center,
                       style: const TextStyle(

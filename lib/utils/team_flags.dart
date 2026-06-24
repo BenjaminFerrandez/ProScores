@@ -54,7 +54,7 @@ class TeamFlag extends StatelessWidget {
         theme: ImageTheme(
           width: width,
           height: height,
-          shape: const RoundedRectangle(4),
+          shape: const Rectangle(),
         ),
       );
     }
@@ -66,10 +66,7 @@ class TeamFlag extends StatelessWidget {
       height: height,
       width: width,
       alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: AppColors.teal.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(4),
-      ),
+      color: AppColors.teal.withValues(alpha: 0.2),
       child: Text(initials,
           style: const TextStyle(
               fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.teal)),

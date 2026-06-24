@@ -9,6 +9,45 @@ class _MockClient extends Mock implements http.Client {}
 void main() {
   setUpAll(() => registerFallbackValue(Uri()));
 
+  test('nationalTeamLogo prefers the national team and returns its logo',
+      () async {
+    final client = _MockClient();
+    final body = jsonEncode({
+      'response': [
+        {
+          'team': {
+            'id': 2,
+            'name': 'France',
+            'national': true,
+            'logo': 'https://media.api-sports.io/football/teams/2.png',
+          }
+        },
+        {
+          'team': {
+            'id': 81,
+            'name': 'Marseille',
+            'national': false,
+            'logo': 'https://media.api-sports.io/football/teams/81.png',
+          }
+        },
+      ]
+    });
+    when(() => client.get(any(), headers: any(named: 'headers')))
+        .thenAnswer((_) async => http.Response(body, 200));
+
+    final repo = HttpFootballRepository(client);
+    final logo = await repo.nationalTeamLogo('France');
+    expect(logo, 'https://media.api-sports.io/football/teams/2.png');
+  });
+
+  test('nationalTeamLogo returns null when no results', () async {
+    final client = _MockClient();
+    when(() => client.get(any(), headers: any(named: 'headers')))
+        .thenAnswer((_) async => http.Response('{"response": []}', 200));
+    final repo = HttpFootballRepository(client);
+    expect(await repo.nationalTeamLogo('Nowhere'), isNull);
+  });
+
   test('parses upcoming fixtures', () async {
     final client = _MockClient();
     final body = jsonEncode({
