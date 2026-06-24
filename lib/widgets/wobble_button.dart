@@ -2,9 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../config/assets.dart';
 
+/// Captures the pressed state via raw pointer events (so it shows instantly
+/// even inside a scrollable, where a tap recognizer would be delayed by the
+/// gesture arena) and triggers [onPressed] on a real tap.
+class _PressFeedback extends StatefulWidget {
+  const _PressFeedback({required this.onPressed, required this.builder});
+  final VoidCallback? onPressed;
+  final Widget Function(bool pressed) builder;
+
+  @override
+  State<_PressFeedback> createState() => _PressFeedbackState();
+}
+
+class _PressFeedbackState extends State<_PressFeedback> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = widget.onPressed != null;
+    void set(bool v) {
+      if (_pressed != v) setState(() => _pressed = v);
+    }
+
+    return Listener(
+      onPointerDown: enabled ? (_) => set(true) : null,
+      onPointerUp: enabled ? (_) => set(false) : null,
+      onPointerCancel: enabled ? (_) => set(false) : null,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: enabled ? widget.onPressed : null,
+        child: widget.builder(enabled && _pressed),
+      ),
+    );
+  }
+}
+
 /// Full-width call-to-action using the hand-drawn rectangle SVG. The lighter
 /// front face (and label) slides toward the shadow on press for a tactile feel.
-class WobbleButton extends StatefulWidget {
+class WobbleButton extends StatelessWidget {
   const WobbleButton({
     super.key,
     required this.label,
@@ -17,41 +52,23 @@ class WobbleButton extends StatefulWidget {
   final double height;
 
   @override
-  State<WobbleButton> createState() => _WobbleButtonState();
-}
-
-class _WobbleButtonState extends State<WobbleButton> {
-  bool _pressed = false;
-
-  @override
   Widget build(BuildContext context) {
-    final enabled = widget.onPressed != null;
     return Opacity(
-      opacity: enabled ? 1 : 0.5,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: enabled ? (_) => setState(() => _pressed = true) : null,
-        onTapUp: enabled
-            ? (_) {
-                setState(() => _pressed = false);
-                widget.onPressed!();
-              }
-            : null,
-        onTapCancel: () => setState(() => _pressed = false),
-        child: SizedBox(
-          height: widget.height,
+      opacity: onPressed != null ? 1 : 0.5,
+      child: _PressFeedback(
+        onPressed: onPressed,
+        builder: (pressed) => SizedBox(
+          height: height,
           width: double.infinity,
           child: Stack(
             children: [
-              // Fixed shadow / back face.
               Positioned.fill(
                 child: SvgPicture.asset(Assets.buttonRectangleBack,
                     fit: BoxFit.fill),
               ),
-              // Lighter front face + label, slides toward the shadow on press.
               Positioned.fill(
                 child: AnimatedSlide(
-                  offset: _pressed ? const Offset(0.015, 0.07) : Offset.zero,
+                  offset: pressed ? const Offset(0.015, 0.07) : Offset.zero,
                   duration: const Duration(milliseconds: 90),
                   curve: Curves.easeOut,
                   child: Stack(
@@ -64,7 +81,7 @@ class _WobbleButtonState extends State<WobbleButton> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
-                          widget.label.toUpperCase(),
+                          label.toUpperCase(),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Colors.white,
@@ -88,7 +105,7 @@ class _WobbleButtonState extends State<WobbleButton> {
 
 /// Small square button using the square SVG background with a centered icon.
 /// The lighter front face + icon slide toward the shadow on press.
-class SquareIconButton extends StatefulWidget {
+class SquareIconButton extends StatelessWidget {
   const SquareIconButton({
     super.key,
     required this.icon,
@@ -101,28 +118,12 @@ class SquareIconButton extends StatefulWidget {
   final double size;
 
   @override
-  State<SquareIconButton> createState() => _SquareIconButtonState();
-}
-
-class _SquareIconButtonState extends State<SquareIconButton> {
-  bool _pressed = false;
-
-  @override
   Widget build(BuildContext context) {
-    final enabled = widget.onPressed != null;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTapDown: enabled ? (_) => setState(() => _pressed = true) : null,
-      onTapUp: enabled
-          ? (_) {
-              setState(() => _pressed = false);
-              widget.onPressed!();
-            }
-          : null,
-      onTapCancel: () => setState(() => _pressed = false),
-      child: SizedBox(
-        height: widget.size,
-        width: widget.size,
+    return _PressFeedback(
+      onPressed: onPressed,
+      builder: (pressed) => SizedBox(
+        height: size,
+        width: size,
         child: Stack(
           children: [
             Positioned.fill(
@@ -131,7 +132,7 @@ class _SquareIconButtonState extends State<SquareIconButton> {
             ),
             Positioned.fill(
               child: AnimatedSlide(
-                offset: _pressed ? const Offset(0.08, 0.10) : Offset.zero,
+                offset: pressed ? const Offset(0.08, 0.10) : Offset.zero,
                 duration: const Duration(milliseconds: 90),
                 curve: Curves.easeOut,
                 child: Stack(
@@ -141,8 +142,7 @@ class _SquareIconButtonState extends State<SquareIconButton> {
                       child: SvgPicture.asset(Assets.buttonSquareFront,
                           fit: BoxFit.fill),
                     ),
-                    Icon(widget.icon,
-                        color: Colors.white, size: widget.size * 0.5),
+                    Icon(icon, color: Colors.white, size: size * 0.5),
                   ],
                 ),
               ),
