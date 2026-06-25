@@ -102,7 +102,7 @@ class _H2HSection extends StatelessWidget {
         const _SectionTitle('Confrontations directes'),
         _Card(
           child: matches.isEmpty
-              ? const Text('Aucune confrontation récente.',
+              ? Text('Aucune confrontation récente.',
                   style: TextStyle(color: AppColors.muted))
               : Column(
                   children: [
@@ -116,7 +116,7 @@ class _H2HSection extends StatelessWidget {
                                 child: Text(
                                     DateFormat('MMM yyyy', 'fr_FR')
                                         .format(m.date.toLocal()),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         color: AppColors.muted, fontSize: 11))),
                             Expanded(
                                 child: Text(frCountry(m.homeName),
@@ -129,7 +129,7 @@ class _H2HSection extends StatelessWidget {
                                   const EdgeInsets.symmetric(horizontal: 8),
                               child: Text(
                                   '${m.homeGoals ?? '-'} - ${m.awayGoals ?? '-'}',
-                                  style: tabularNumberStyle(const TextStyle(
+                                  style: tabularNumberStyle(TextStyle(
                                       fontWeight: FontWeight.w800,
                                       color: AppColors.light))),
                             ),
@@ -162,7 +162,7 @@ class _TeamSection extends StatelessWidget {
           _Card(child: _ResultsBlock(team.recentResults)),
         if (team.squad.isNotEmpty) _Card(child: _SquadBlock(team.squad)),
         if (team.recentResults.isEmpty && team.squad.isEmpty)
-          const _Card(
+          _Card(
             child: Text('Aucune donnée disponible pour cette équipe.',
                 style: TextStyle(color: AppColors.muted)),
           ),
@@ -201,12 +201,12 @@ class _ResultsBlock extends StatelessWidget {
                     width: 56,
                     child: Text(
                         DateFormat('d MMM', 'fr_FR').format(r.date.toLocal()),
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: AppColors.muted, fontSize: 11))),
                 SizedBox(
                     width: 26,
                     child: Text(r.isHome ? 'dom.' : 'ext.',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: AppColors.muted, fontSize: 10))),
                 Expanded(
                     child: Text(frCountry(r.opponent),
@@ -214,7 +214,7 @@ class _ResultsBlock extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontSize: 13))),
                 Text('${r.goalsFor} - ${r.goalsAgainst}',
-                    style: tabularNumberStyle(const TextStyle(
+                    style: tabularNumberStyle(TextStyle(
                         fontWeight: FontWeight.w800, color: AppColors.light))),
                 const SizedBox(width: 8),
                 _OutcomeBadge(r.outcome),
@@ -279,12 +279,12 @@ class _SquadBlock extends StatelessWidget {
                           style: const TextStyle(fontSize: 13))),
                   if ((p.appearances ?? 0) > 0)
                     Text('${p.appearances} m',
-                        style: tabularNumberStyle(const TextStyle(
+                        style: tabularNumberStyle(TextStyle(
                             color: AppColors.muted, fontSize: 11))),
                   if ((p.goals ?? 0) > 0) ...[
                     const SizedBox(width: 10),
                     Text('${p.goals} ⚽',
-                        style: tabularNumberStyle(const TextStyle(
+                        style: tabularNumberStyle(TextStyle(
                             color: AppColors.light,
                             fontSize: 11,
                             fontWeight: FontWeight.w700))),

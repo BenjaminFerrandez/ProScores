@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../config/constants.dart';
 import '../config/theme.dart';
 import '../models/market.dart';
 import '../models/risk_level.dart';
@@ -39,7 +40,7 @@ class MatchDetailScreen extends ConsumerWidget {
                 DateFormat("EEEE d MMM · HH:mm", 'fr_FR')
                     .format(match.kickoff.toLocal()),
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+                style: TextStyle(color: AppColors.muted, fontSize: 12)),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -47,7 +48,7 @@ class MatchDetailScreen extends ConsumerWidget {
                 Text(match.home.name,
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 16)),
-                const Text('VS', style: TextStyle(color: AppColors.muted)),
+                Text('VS', style: TextStyle(color: AppColors.muted)),
                 Text(match.away.name,
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 16)),
@@ -55,8 +56,8 @@ class MatchDetailScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             if (match.markets.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Text('Cotes indisponibles pour ce match.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: AppColors.muted)),
@@ -106,24 +107,52 @@ class _MarketCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          ...market.selections.map((s) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    SizedBox(
-                        width: 60,
-                        child: Text(s.label,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 12))),
-                    Expanded(
-                        child: ProbabilityBar(
-                            probability: s.adjustedProbability,
-                            oddLabel: s.odd.toStringAsFixed(2))),
+          ...market.selections.map((s) {
+            final value = s.valueEdge != null &&
+                s.valueEdge! >= kValueEdgeThreshold;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                children: [
+                  SizedBox(
+                      width: 60,
+                      child: Text(s.label,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 12))),
+                  Expanded(
+                      child: ProbabilityBar(
+                          probability: s.adjustedProbability,
+                          oddLabel: s.odd.toStringAsFixed(2))),
+                  if (value) ...[
+                    const SizedBox(width: 8),
+                    _ValueTag(s.valueEdge!),
                   ],
-                ),
-              )),
+                ],
+              ),
+            );
+          }),
         ],
       ),
+    );
+  }
+}
+
+/// Highlights a selection priced above the market consensus (a value bet).
+class _ValueTag extends StatelessWidget {
+  const _ValueTag(this.edge);
+  final double edge;
+  @override
+  Widget build(BuildContext context) {
+    const color = Color(0xFF5FE3B6);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.18),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color)),
+      child: Text('★ +${(edge * 100).round()}%',
+          style: const TextStyle(
+              color: color, fontSize: 10, fontWeight: FontWeight.w800)),
     );
   }
 }

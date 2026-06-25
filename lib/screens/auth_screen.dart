@@ -61,7 +61,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             children: [
               RichText(
                 textAlign: TextAlign.center,
-                text: const TextSpan(children: [
+                text: TextSpan(children: [
                   TextSpan(
                       text: 'ProScores',
                       style: TextStyle(
@@ -79,7 +79,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               const SizedBox(height: 8),
               Text(_isSignUp ? 'Crée ton compte' : 'Connexion',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.muted)),
+                  style: TextStyle(color: AppColors.muted)),
               const SizedBox(height: 24),
               _Field(label: 'E-mail', controller: _email, email: true),
               const SizedBox(height: 14),
@@ -155,7 +155,7 @@ class _Field extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: const TextStyle(
+            style: TextStyle(
                 color: AppColors.muted,
                 fontWeight: FontWeight.w600,
                 fontSize: 13)),

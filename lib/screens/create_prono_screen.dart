@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../config/constants.dart';
 import '../config/theme.dart';
 import '../models/combo.dart';
 import '../models/combo_sort.dart';
@@ -103,7 +105,7 @@ class _CreatePronoScreenState extends ConsumerState<CreatePronoScreen> {
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
                 children: [
-                  const Text('Filtres (optionnels)',
+                  Text('Filtres (optionnels)',
                       style: TextStyle(
                           color: AppColors.light,
                           fontWeight: FontWeight.w800,
@@ -132,17 +134,17 @@ class _CreatePronoScreenState extends ConsumerState<CreatePronoScreen> {
           ),
           if (_filtersOpen) ...[
             const SizedBox(height: 8),
-            const Text('Laisse vide pour voir tous les combinés possibles.',
+            Text('Laisse vide pour voir tous les combinés possibles.',
                 style: TextStyle(color: AppColors.muted, fontSize: 12)),
             const SizedBox(height: 14),
-            const Text('Niveau de risque',
+            Text('Niveau de risque',
                 style: TextStyle(
                     color: AppColors.muted, fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             _RiskSelector(
                 value: _risk, onChanged: (r) => setState(() => _risk = r)),
             const SizedBox(height: 16),
-            const Text('Équipes',
+            Text('Équipes',
                 style: TextStyle(
                     color: AppColors.muted, fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
@@ -189,9 +191,9 @@ class _SortBar extends StatelessWidget {
       padding: const EdgeInsets.only(top: 8, bottom: 2),
       child: Row(
         children: [
-          const Icon(Icons.sort, size: 18, color: AppColors.muted),
+          Icon(Icons.sort, size: 18, color: AppColors.muted),
           const SizedBox(width: 8),
-          const Text('Trier :',
+          Text('Trier :',
               style: TextStyle(color: AppColors.muted, fontSize: 13)),
           const SizedBox(width: 8),
           Expanded(
@@ -200,7 +202,7 @@ class _SortBar extends StatelessWidget {
               isExpanded: true,
               dropdownColor: AppColors.card,
               underline: const SizedBox.shrink(),
-              style: const TextStyle(
+              style: TextStyle(
                   color: AppColors.light,
                   fontSize: 13,
                   fontWeight: FontWeight.w600),
@@ -233,11 +235,11 @@ class _TeamFilter extends ConsumerWidget {
       loading: () => const Padding(
           padding: EdgeInsets.all(8),
           child: Center(child: CircularProgressIndicator())),
-      error: (_, __) => const Text('Équipes indisponibles.',
+      error: (_, __) => Text('Équipes indisponibles.',
           style: TextStyle(color: AppColors.muted, fontSize: 12)),
       data: (list) {
         if (list.isEmpty) {
-          return const Text('Aucune équipe à venir.',
+          return Text('Aucune équipe à venir.',
               style: TextStyle(color: AppColors.muted, fontSize: 12));
         }
         return Column(
@@ -284,23 +286,37 @@ class _TeamFilter extends ConsumerWidget {
   }
 }
 
-class _Results extends ConsumerWidget {
+class _Results extends ConsumerStatefulWidget {
   const _Results({required this.request});
   final ComboRequest request;
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final combos = ref.watch(comboProvider(request));
+  ConsumerState<_Results> createState() => _ResultsState();
+}
+
+class _ResultsState extends ConsumerState<_Results> {
+  int _visible = kComboCount;
+
+  @override
+  void didUpdateWidget(_Results old) {
+    super.didUpdateWidget(old);
+    // New generation or new sort -> show the first page again.
+    if (old.request != widget.request) _visible = kComboCount;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final combos = ref.watch(comboProvider(widget.request));
     return combos.when(
       loading: () => const Padding(
           padding: EdgeInsets.all(24),
           child: Center(child: CircularProgressIndicator())),
       error: (e, _) => ErrorRetry(
           message: 'Erreur lors de la génération.\n$e',
-          onRetry: () => ref.invalidate(comboProvider(request))),
+          onRetry: () => ref.invalidate(comboProvider(widget.request))),
       data: (list) {
         if (list.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 24),
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
             child: Text(
                 'Aucun combiné ne correspond à ces paramètres. '
                 'Essaie un objectif différent ou élargis tes filtres.',
@@ -308,10 +324,25 @@ class _Results extends ConsumerWidget {
                 style: TextStyle(color: AppColors.muted)),
           );
         }
+        final shown = list.length < _visible ? list.length : _visible;
         return Column(
           children: [
-            for (var i = 0; i < list.length; i++)
+            for (var i = 0; i < shown; i++)
               _ComboCard(combo: list[i], best: i == 0),
+            if (shown < list.length)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: OutlinedButton.icon(
+                  onPressed: () => setState(() => _visible += kComboCount),
+                  style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.teal,
+                      side: const BorderSide(color: AppColors.teal),
+                      minimumSize: const Size.fromHeight(48)),
+                  icon: const Icon(Icons.expand_more, size: 20),
+                  label: const Text('Voir plus',
+                      style: TextStyle(fontWeight: FontWeight.w700)),
+                ),
+              ),
           ],
         );
       },
@@ -371,12 +402,12 @@ class _ComboCard extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 2),
                       child: Row(
                         children: [
-                          const Icon(Icons.subdirectory_arrow_right,
+                          Icon(Icons.subdirectory_arrow_right,
                               size: 12, color: AppColors.muted),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(BetExplainer.explain(l),
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontSize: 11,
                                     color: AppColors.muted,
                                     fontStyle: FontStyle.italic)),
@@ -398,9 +429,34 @@ class _ComboCard extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w700)),
             ],
           ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: _shareText(combo)));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Combiné copié — prêt à partager !')));
+              },
+              icon: const Icon(Icons.share, size: 16, color: AppColors.teal),
+              label: const Text('Partager',
+                  style: TextStyle(color: AppColors.teal, fontSize: 12)),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  static String _shareText(Combo combo) {
+    final buffer = StringBuffer('🎯 Mon combiné ProScores\n');
+    for (final l in combo.legs) {
+      buffer.writeln('• ${l.matchLabel} · ${l.selection.label} '
+          '(${l.selection.odd.toStringAsFixed(2)})');
+    }
+    buffer.writeln('Cote totale ×${combo.totalOdds.toStringAsFixed(2)} · '
+        '${(combo.probability * 100).round()}% de réussite');
+    buffer.write('Gain potentiel : ${combo.potentialWin.toStringAsFixed(2)}€');
+    return buffer.toString();
   }
 }
 
@@ -417,7 +473,7 @@ class _NumberField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(
+              style: TextStyle(
                   color: AppColors.muted, fontWeight: FontWeight.w600)),
           const SizedBox(height: 6),
           TextField(

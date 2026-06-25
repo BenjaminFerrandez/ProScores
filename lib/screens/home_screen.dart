@@ -19,7 +19,7 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.dark,
         title: RichText(
-          text: const TextSpan(children: [
+          text: TextSpan(children: [
             TextSpan(
                 text: 'ProScores',
                 style: TextStyle(
@@ -86,9 +86,9 @@ class _MatchList extends StatelessWidget {
     if (matches.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        children: const [
+        children: [
           Padding(
-            padding: EdgeInsets.only(top: 120),
+            padding: const EdgeInsets.only(top: 120),
             child: Center(
                 child: Text('Aucun match à venir.',
                     style: TextStyle(color: AppColors.muted))),
@@ -116,7 +116,7 @@ class _MatchList extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(4, 14, 4, 8),
               child: Text(day.toUpperCase(),
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: AppColors.muted,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
@@ -165,7 +165,7 @@ class _MatchRow extends StatelessWidget {
             ),
             _Favorite(match),
             const SizedBox(width: 6),
-            const Icon(Icons.chevron_right, color: AppColors.muted),
+            Icon(Icons.chevron_right, color: AppColors.muted),
           ],
         ),
       ),
@@ -208,7 +208,7 @@ class _Favorite extends StatelessWidget {
               textAlign: TextAlign.end,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: AppColors.muted, fontSize: 9)),
+              style: TextStyle(color: AppColors.muted, fontSize: 9)),
         ),
       ],
     );

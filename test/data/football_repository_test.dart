@@ -215,4 +215,65 @@ void main() {
     expect(h2h.first.homeGoals, 0);
     expect(h2h.first.awayGoals, 1);
   });
+
+  test('matchStats parses the aggregated bundle in one call', () async {
+    final client = _MockClient();
+    Map<String, dynamic> fixture(int homeId, int awayId, String date) => {
+          'fixture': {
+            'date': date,
+            'status': {'short': 'FT'}
+          },
+          'teams': {
+            'home': {'id': homeId, 'name': 'France'},
+            'away': {'id': awayId, 'name': 'Spain'},
+          },
+          'goals': {'home': 2, 'away': 1},
+        };
+    final body = jsonEncode({
+      'homeId': 2,
+      'awayId': 9,
+      'h2h': {
+        'response': [fixture(2, 9, '2022-09-27T18:00:00+00:00')]
+      },
+      'home': {
+        'fixtures': {
+          'response': [fixture(2, 9, '2024-06-01T18:00:00+00:00')]
+        },
+        'players': [
+          {
+            'response': [
+              {
+                'player': {'name': 'Mbappe'},
+                'statistics': [
+                  {
+                    'games': {'appearences': 7, 'position': 'Attacker'},
+                    'goals': {'total': 5}
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+      },
+      'away': {
+        'fixtures': {'response': <dynamic>[]},
+        'players': [
+          {'response': <dynamic>[]}
+        ],
+      },
+    });
+    when(() => client.get(any(), headers: any(named: 'headers')))
+        .thenAnswer((_) async => http.Response(body, 200));
+
+    final repo = HttpFootballRepository(client);
+    final s = await repo.matchStats('France', 'Spain');
+
+    expect(s.homeId, 2);
+    expect(s.awayId, 9);
+    expect(s.homeResults, hasLength(1));
+    expect(s.homeResults.first.goalsFor, 2);
+    expect(s.homeSquad.single.name, 'Mbappe');
+    expect(s.homeSquad.single.goals, 5);
+    expect(s.h2h, hasLength(1));
+  });
 }

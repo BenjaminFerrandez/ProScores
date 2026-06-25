@@ -22,7 +22,8 @@ final worldCupFixturesProvider =
   for (final e in events) {
     final markets = <Market>[];
     if (e.h2h != null && e.h2h!.length == 3) {
-      markets.add(MarketBuilder.build1x2(bookmakerOdds: e.h2h!));
+      markets.add(MarketBuilder.build1x2(
+          bookmakerOdds: e.h2h!, consensus: e.h2hConsensus));
     }
     if (e.totals != null) {
       markets.add(MarketBuilder.buildTotals(

@@ -12,6 +12,7 @@ class MarketBuilder {
   static Market build1x2({
     required List<double> bookmakerOdds,
     Prediction? prediction,
+    List<double>? consensus,
   }) {
     final implied = ProbabilityService.normalizeImplied(bookmakerOdds);
     final modelProbs = prediction == null
@@ -23,11 +24,16 @@ class MarketBuilder {
       final p = modelProbs == null
           ? implied[i]
           : ProbabilityService.blend(implied[i], modelProbs[i]);
+      // Value vs the market consensus: odd * consensusProb - 1.
+      final edge = consensus != null && consensus.length == 3
+          ? bookmakerOdds[i] * consensus[i] - 1
+          : null;
       selections.add(Selection(
         label: labels[i],
         odd: bookmakerOdds[i],
         adjustedProbability: p,
         risk: RiskClassifier.classify(p),
+        valueEdge: edge,
       ));
     }
     return Market(type: MarketType.resultat1x2, selections: selections);

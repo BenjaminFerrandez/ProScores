@@ -1,3 +1,11 @@
+/// Base URL of our backend proxy (server/). The app never talks to The Odds
+/// API or API-Football directly — the server holds the keys and caches data.
+///
+/// - Desktop / web / iOS simulator: http://localhost:8080
+/// - Android emulator: http://10.0.2.2:8080 (the emulator's alias for the host)
+/// - Physical device: `http://<your-machine-LAN-IP>:8080`
+const String kServerBaseUrl = 'http://localhost:8080';
+
 /// API-Football league id for the World Cup. Confirm at integration time.
 const int kWorldCupLeagueId = 1;
 
@@ -26,8 +34,16 @@ const int kMaxComboLegs = 40;
 const double kLowRiskMaxOdd = 1.50;
 const double kModerateMaxOdd = 2.50;
 
-/// Number of combo proposals to return.
+/// Number of combo proposals shown per "page" (and revealed by "Voir plus").
 const int kComboCount = 3;
+
+/// Max combos the generator produces up front, so "Voir plus" can reveal more
+/// without any extra work. Shown 3 at a time.
+const int kComboMaxResults = 30;
+
+/// Minimum edge over the market consensus to flag a selection as a "value bet"
+/// (0.03 == the offered price beats the consensus by 3%+).
+const double kValueEdgeThreshold = 0.03;
 
 /// Reference season for team/player stats and recent results on API-Football.
 /// The free plan only exposes seasons 2022–2024, so 2024 is the most recent

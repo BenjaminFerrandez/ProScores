@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'config/theme.dart';
 import 'providers/auth_provider.dart';
+import 'providers/theme_provider.dart';
 import 'screens/auth_screen.dart';
 import 'screens/home_screen.dart';
 
@@ -12,15 +13,20 @@ Future<void> main() async {
   runApp(const ProviderScope(child: ProScoresApp()));
 }
 
-class ProScoresApp extends StatelessWidget {
+class ProScoresApp extends ConsumerWidget {
   const ProScoresApp({super.key});
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: 'ProScores',
-        debugShowCheckedModeBanner: false,
-        theme: buildAppTheme(),
-        home: const _AuthGate(),
-      );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(themeModeProvider);
+    final brightness =
+        mode == ThemeMode.light ? Brightness.light : Brightness.dark;
+    return MaterialApp(
+      title: 'ProScores',
+      debugShowCheckedModeBanner: false,
+      theme: buildAppTheme(brightness),
+      home: const _AuthGate(),
+    );
+  }
 }
 
 /// Shows the auth screen when logged out, the app when logged in.

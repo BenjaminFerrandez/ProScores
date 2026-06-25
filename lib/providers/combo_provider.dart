@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../config/constants.dart';
 import '../models/combo.dart';
 import '../models/combo_sort.dart';
 import '../models/risk_level.dart';
@@ -91,5 +92,6 @@ final comboProvider =
     risk: req.risk,
     pool: pool,
     sort: req.sort,
+    maxResults: kComboMaxResults,
   );
 });

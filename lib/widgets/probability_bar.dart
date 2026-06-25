@@ -52,7 +52,7 @@ class ProbabilityBar extends StatelessWidget {
           width: 44,
           child: Text(oddLabel,
               textAlign: TextAlign.right,
-              style: tabularNumberStyle(const TextStyle(
+              style: tabularNumberStyle(TextStyle(
                   fontWeight: FontWeight.w700, color: AppColors.light))),
         ),
       ],

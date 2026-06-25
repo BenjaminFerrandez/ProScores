@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../config/constants.dart';
 import '../config/theme.dart';
 import '../providers/auth_provider.dart';
+import '../providers/theme_provider.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -26,7 +27,7 @@ class AccountScreen extends ConsumerWidget {
                   fontWeight: FontWeight.w700, fontSize: 16)),
           const SizedBox(height: 4),
           Text('Membre depuis le ${DateFormat('d MMM yyyy', 'fr_FR').format(user.createdAt)}',
-              style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+              style: TextStyle(color: AppColors.muted, fontSize: 12)),
           const SizedBox(height: 20),
 
           // Commission balance
@@ -38,7 +39,7 @@ class AccountScreen extends ConsumerWidget {
                 border: Border.all(color: AppColors.teal)),
             child: Column(
               children: [
-                const Text('Mes commissions',
+                Text('Mes commissions',
                     style: TextStyle(
                         color: AppColors.muted,
                         fontWeight: FontWeight.w600,
@@ -87,13 +88,13 @@ class AccountScreen extends ConsumerWidget {
           Text(
               'Partage ce code : tu gagnes ${kReferralCommission.toStringAsFixed(0)} € '
               '(virtuels) à chaque inscription avec ton code.',
-              style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+              style: TextStyle(color: AppColors.muted, fontSize: 12)),
           const SizedBox(height: 18),
 
           // Referrals list
           _SectionTitle('Mes filleuls (${referrals.length})'),
           if (referrals.isEmpty)
-            const Text('Personne ne s\'est encore inscrit avec ton code.',
+            Text('Personne ne s\'est encore inscrit avec ton code.',
                 style: TextStyle(color: AppColors.muted))
           else
             ...referrals.map((r) => Container(
@@ -104,7 +105,7 @@ class AccountScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(12)),
                   child: Row(
                     children: [
-                      const Icon(Icons.person, color: AppColors.muted, size: 18),
+                      Icon(Icons.person, color: AppColors.muted, size: 18),
                       const SizedBox(width: 10),
                       Expanded(
                           child: Text(r.email,
@@ -121,11 +122,30 @@ class AccountScreen extends ConsumerWidget {
                 )),
 
           const SizedBox(height: 20),
+          _SectionTitle('Préférences'),
+          Container(
+            decoration: BoxDecoration(
+                color: AppColors.card, borderRadius: BorderRadius.circular(12)),
+            child: SwitchListTile(
+              value: ref.watch(themeModeProvider) == ThemeMode.dark,
+              onChanged: (_) =>
+                  ref.read(themeModeProvider.notifier).toggle(),
+              activeThumbColor: AppColors.teal,
+              title: const Text('Thème sombre',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+              secondary: Icon(
+                  ref.watch(themeModeProvider) == ThemeMode.dark
+                      ? Icons.dark_mode
+                      : Icons.light_mode,
+                  color: AppColors.teal),
+            ),
+          ),
+          const SizedBox(height: 20),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
                 color: AppColors.card, borderRadius: BorderRadius.circular(12)),
-            child: const Text(
+            child: Text(
                 '⚠️ Démo pédagogique : les commissions sont fictives et stockées '
                 'localement. Aucun argent réel n\'est impliqué.',
                 style: TextStyle(color: AppColors.muted, fontSize: 11)),
