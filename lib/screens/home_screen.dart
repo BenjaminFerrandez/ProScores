@@ -26,16 +26,22 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.dark,
-        centerTitle: true,
-        leadingWidth: 64,
-        leading: const Padding(
-          padding: EdgeInsets.only(left: 12),
-          child: Center(
-            child: SquareIconButton(
-                icon: Icons.sports_soccer, onPressed: null),
-          ),
+        title: RichText(
+          text: const TextSpan(children: [
+            TextSpan(
+                text: 'ProScores',
+                style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 20,
+                    color: AppColors.light)),
+            TextSpan(
+                text: '.',
+                style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 20,
+                    color: AppColors.teal)),
+          ]),
         ),
-        title: const AppLogo(height: 34),
         actions: const [SizedBox(width: 64)],
       ),
       body: matches.when(

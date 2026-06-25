@@ -30,4 +30,26 @@ void main() {
     expect(probs.first, closeTo(0.5405, 1e-3));
     expect(market.selections.first.risk, RiskLevel.modere);
   });
+
+  test('buildTotals labels the line and removes the margin', () {
+    final market =
+        MarketBuilder.buildTotals(point: 2.5, overOdd: 2.0, underOdd: 2.0);
+    expect(market.type, MarketType.totalButs);
+    expect(market.selections.map((s) => s.label).toList(), ['+2.5', '-2.5']);
+    expect(market.selections.map((s) => s.odd).toList(), [2.0, 2.0]);
+    // even odds -> 50/50 after normalization
+    expect(market.selections.first.adjustedProbability, closeTo(0.5, 1e-9));
+  });
+
+  test('buildSpreads shows signed handicap lines for home and away', () {
+    final market = MarketBuilder.buildSpreads(
+        homePoint: -1.5, homeOdd: 1.9, awayPoint: 1.5, awayOdd: 1.95);
+    expect(market.type, MarketType.handicap);
+    expect(market.selections.first.label, '1 (-1.5)');
+    expect(market.selections.last.label, '2 (+1.5)');
+    final sum = market.selections
+        .map((s) => s.adjustedProbability)
+        .reduce((a, b) => a + b);
+    expect(sum, closeTo(1.0, 1e-9));
+  });
 }

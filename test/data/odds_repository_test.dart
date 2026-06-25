@@ -49,6 +49,52 @@ void main() {
     expect(e.h2h, [2.10, 3.40, 3.05]); // home, draw, away
   });
 
+  test('parses totals and spreads from the bookmaker', () async {
+    final client = _MockClient();
+    final body = jsonEncode([
+      {
+        'id': 'e1',
+        'commence_time': '2026-06-23T17:00:00Z',
+        'home_team': 'France',
+        'away_team': 'Brazil',
+        'bookmakers': [
+          {
+            'markets': [
+              {
+                'key': 'totals',
+                'outcomes': [
+                  {'name': 'Over', 'price': 2.10, 'point': 2.5},
+                  {'name': 'Under', 'price': 1.75, 'point': 2.5},
+                ]
+              },
+              {
+                'key': 'spreads',
+                'outcomes': [
+                  {'name': 'France', 'price': 1.90, 'point': -1.5},
+                  {'name': 'Brazil', 'price': 1.95, 'point': 1.5},
+                ]
+              },
+            ]
+          }
+        ]
+      }
+    ]);
+    when(() => client.get(any(), headers: any(named: 'headers')))
+        .thenAnswer((_) async => http.Response(body, 200));
+
+    final repo = HttpOddsRepository(client);
+    final e = (await repo.fetchWorldCupEvents()).single;
+
+    expect(e.totals!.point, 2.5);
+    expect(e.totals!.overOdd, 2.10);
+    expect(e.totals!.underOdd, 1.75);
+    expect(e.spreads!.homePoint, -1.5);
+    expect(e.spreads!.homeOdd, 1.90);
+    expect(e.spreads!.awayPoint, 1.5);
+    expect(e.spreads!.awayOdd, 1.95);
+    expect(e.h2h, isNull); // no h2h market in this payload
+  });
+
   test('keeps event but leaves h2h null when no bookmaker odds', () async {
     final client = _MockClient();
     final body = jsonEncode([

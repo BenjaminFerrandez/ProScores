@@ -32,4 +32,58 @@ class MarketBuilder {
     }
     return Market(type: MarketType.resultat1x2, selections: selections);
   }
+
+  /// Builds the totals (over/under) market from a single bookmaker line.
+  /// Probabilities are the margin-removed implied probabilities.
+  static Market buildTotals({
+    required double point,
+    required double overOdd,
+    required double underOdd,
+  }) {
+    final probs = ProbabilityService.normalizeImplied([overOdd, underOdd]);
+    final line = _formatPoint(point);
+    return Market(type: MarketType.totalButs, selections: [
+      Selection(
+          label: '+$line',
+          odd: overOdd,
+          adjustedProbability: probs[0],
+          risk: RiskClassifier.classify(probs[0])),
+      Selection(
+          label: '-$line',
+          odd: underOdd,
+          adjustedProbability: probs[1],
+          risk: RiskClassifier.classify(probs[1])),
+    ]);
+  }
+
+  /// Builds the handicap (spreads) market. Home is shown as "1", away as "2",
+  /// each annotated with its handicap line.
+  static Market buildSpreads({
+    required double homePoint,
+    required double homeOdd,
+    required double awayPoint,
+    required double awayOdd,
+  }) {
+    final probs = ProbabilityService.normalizeImplied([homeOdd, awayOdd]);
+    return Market(type: MarketType.handicap, selections: [
+      Selection(
+          label: '1 (${_signed(homePoint)})',
+          odd: homeOdd,
+          adjustedProbability: probs[0],
+          risk: RiskClassifier.classify(probs[0])),
+      Selection(
+          label: '2 (${_signed(awayPoint)})',
+          odd: awayOdd,
+          adjustedProbability: probs[1],
+          risk: RiskClassifier.classify(probs[1])),
+    ]);
+  }
+
+  /// "2.5" -> "2.5", "3.0" -> "3".
+  static String _formatPoint(double p) =>
+      p == p.roundToDouble() ? p.toStringAsFixed(0) : p.toString();
+
+  /// Adds an explicit sign: 1.5 -> "+1.5", -1.5 -> "-1.5".
+  static String _signed(double p) =>
+      '${p > 0 ? '+' : ''}${_formatPoint(p)}';
 }

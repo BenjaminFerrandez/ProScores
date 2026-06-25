@@ -23,6 +23,21 @@ final worldCupFixturesProvider =
     if (e.h2h != null && e.h2h!.length == 3) {
       markets.add(MarketBuilder.build1x2(bookmakerOdds: e.h2h!));
     }
+    if (e.totals != null) {
+      markets.add(MarketBuilder.buildTotals(
+        point: e.totals!.point,
+        overOdd: e.totals!.overOdd,
+        underOdd: e.totals!.underOdd,
+      ));
+    }
+    if (e.spreads != null) {
+      markets.add(MarketBuilder.buildSpreads(
+        homePoint: e.spreads!.homePoint,
+        homeOdd: e.spreads!.homeOdd,
+        awayPoint: e.spreads!.awayPoint,
+        awayOdd: e.spreads!.awayOdd,
+      ));
+    }
     fixtures.add(MatchFixture(
       id: stableFixtureId(e.id),
       competition: 'Coupe du Monde',
