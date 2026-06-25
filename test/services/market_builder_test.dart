@@ -5,6 +5,26 @@ import 'package:proscores/models/risk_level.dart';
 import 'package:proscores/services/market_builder.dart';
 
 void main() {
+  test('build1x2 flags a value bet from the consensus', () {
+    // Home offered at 2.20 but the market consensus says home is 50% likely.
+    // Edge = 2.20 * 0.50 - 1 = +0.10 (value). Away offered at 4.0, consensus
+    // 0.25 -> edge = 0.0 (no value).
+    final market = MarketBuilder.build1x2(
+      bookmakerOdds: [2.20, 4.0, 4.0],
+      consensus: [0.50, 0.25, 0.25],
+    );
+    expect(market.selections[0].valueEdge, closeTo(0.10, 1e-9));
+    expect(market.selections[0].isValue, isTrue);
+    expect(market.selections[2].valueEdge, closeTo(0.0, 1e-9));
+    expect(market.selections[2].isValue, isFalse);
+  });
+
+  test('build1x2 leaves valueEdge null without a consensus', () {
+    final market = MarketBuilder.build1x2(bookmakerOdds: [2.0, 4.0, 4.0]);
+    expect(market.selections.first.valueEdge, isNull);
+    expect(market.selections.first.isValue, isFalse);
+  });
+
   test('build1x2 blends odds + prediction and tags risk', () {
     // implied from 2.0/4.0/4.0 -> 0.5/0.25/0.25 (already normalized)
     const pred = Prediction(homeProb: 0.5, drawProb: 0.25, awayProb: 0.25);

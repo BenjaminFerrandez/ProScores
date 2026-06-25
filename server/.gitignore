@@ -1,0 +1,13 @@
+.dart_tool/
+.packages
+
+# Test/run artifacts.
+srv.log
+srv.err
+
+# Secrets live only here, never committed.
+lib/secrets.dart
+
+# Local SQLite cache.
+cache.db
+cache.db-journal

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../config/api_keys.dart';
+import '../config/constants.dart';
 import 'football_repository.dart' show ApiException;
 
 /// Over/under goals line for an event (a single, featured totals line).
@@ -36,6 +36,10 @@ class OddsEvent {
   /// Ordered [home, draw, away]. Null when no bookmaker h2h odds are available.
   final List<double>? h2h;
 
+  /// Market-consensus fair probabilities [home, draw, away], averaged across
+  /// every bookmaker (margin removed). Used to flag value bets.
+  final List<double>? h2hConsensus;
+
   /// Over/under goals line. Null when no bookmaker offers it.
   final TotalsOdds? totals;
 
@@ -48,6 +52,7 @@ class OddsEvent {
     required this.homeTeam,
     required this.awayTeam,
     this.h2h,
+    this.h2hConsensus,
     this.totals,
     this.spreads,
   });
@@ -62,16 +67,11 @@ class HttpOddsRepository implements OddsRepository {
   HttpOddsRepository(this.client);
   final http.Client client;
 
-  static const _base =
-      'https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/odds';
-
   @override
   Future<List<OddsEvent>> fetchWorldCupEvents() async {
-    // h2h, totals and spreads are all "featured" markets, so a single bulk
-    // call covers every match for just 3 credits total (1 per market).
-    final uri = Uri.parse('$_base?regions=eu&markets=h2h,totals,spreads'
-        '&oddsFormat=decimal&apiKey=$oddsApiKey');
-    final res = await client.get(uri, headers: const {});
+    // Served (and cached) by our backend, which holds the API key.
+    final uri = Uri.parse('$kServerBaseUrl/odds/worldcup');
+    final res = await client.get(uri);
     if (res.statusCode != 200) {
       throw ApiException('odds HTTP ${res.statusCode}');
     }
@@ -88,9 +88,47 @@ class HttpOddsRepository implements OddsRepository {
       homeTeam: home,
       awayTeam: away,
       h2h: _extractH2h(g, home, away),
+      h2hConsensus: _extractH2hConsensus(g, home, away),
       totals: _extractTotals(g),
       spreads: _extractSpreads(g, home, away),
     );
+  }
+
+  /// Average, across every bookmaker, of the margin-removed h2h probabilities.
+  /// This is a better estimate of the "true" outcome probability than any
+  /// single bookmaker, so it lets us spot value (a price that beats it).
+  List<double>? _extractH2hConsensus(
+      Map<String, dynamic> g, String home, String away) {
+    final bookmakers =
+        (g['bookmakers'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+    final sums = [0.0, 0.0, 0.0];
+    var count = 0;
+    for (final b in bookmakers) {
+      final markets =
+          (b['markets'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+      final h2h = markets.where((m) => m['key'] == 'h2h');
+      if (h2h.isEmpty) continue;
+      final outcomes = (h2h.first['outcomes'] as List).cast<Map<String, dynamic>>();
+      double? price(String name) {
+        for (final o in outcomes) {
+          if (o['name'] == name) return (o['price'] as num).toDouble();
+        }
+        return null;
+      }
+
+      final ph = price(home), pd = price('Draw'), pa = price(away);
+      if (ph == null || pd == null || pa == null) continue;
+      final implied = [1 / ph, 1 / pd, 1 / pa];
+      final s = implied[0] + implied[1] + implied[2];
+      for (var i = 0; i < 3; i++) {
+        sums[i] += implied[i] / s; // this bookmaker's margin-removed prob
+      }
+      count++;
+    }
+    if (count == 0) return null;
+    final avg = [sums[0] / count, sums[1] / count, sums[2] / count];
+    final t = avg[0] + avg[1] + avg[2];
+    return [avg[0] / t, avg[1] / t, avg[2] / t];
   }
 
   /// Returns the outcomes of the first bookmaker offering [marketKey], or null.

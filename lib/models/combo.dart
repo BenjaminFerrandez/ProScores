@@ -1,12 +1,15 @@
+import 'market.dart';
 import 'selection.dart';
 
 class ComboLeg {
   final int matchId;
   final String matchLabel;
+  final MarketType market;
   final Selection selection;
   const ComboLeg({
     required this.matchId,
     required this.matchLabel,
+    required this.market,
     required this.selection,
   });
 }

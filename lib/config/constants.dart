@@ -1,3 +1,11 @@
+/// Base URL of our backend proxy (server/). The app never talks to The Odds
+/// API or API-Football directly — the server holds the keys and caches data.
+///
+/// - Desktop / web / iOS simulator: http://localhost:8080
+/// - Android emulator: http://10.0.2.2:8080 (the emulator's alias for the host)
+/// - Physical device: `http://<your-machine-LAN-IP>:8080`
+const String kServerBaseUrl = 'http://localhost:8080';
+
 /// API-Football league id for the World Cup. Confirm at integration time.
 const int kWorldCupLeagueId = 1;
 
@@ -12,10 +20,12 @@ const double kBookmakerWeight = 0.5;
 /// multiplier (0.10 == ±10%).
 const double kComboTolerance = 0.10;
 
-/// Maximum number of legs in a generated combo. High enough that low-odds
-/// (low-risk) selections can still be stacked to reach a large target
-/// multiplier (e.g. ~13 legs at 1.20 odds to reach ×10).
-const int kMaxComboLegs = 20;
+/// Maximum number of legs in a generated combo. Effectively "unlimited" for
+/// this app: there are only ~28 World Cup matches and a combo uses at most one
+/// leg per match, so this ceiling (well above the match count) lets low-odds
+/// combos stack as deep as needed to reach big targets (e.g. 10€ -> 500€, ×50,
+/// ~22 legs at 1.20 odds).
+const int kMaxComboLegs = 40;
 
 /// Risk is expressed as the band of *individual* odds a leg may have.
 /// Faible (peu risqué): low odds, up to [kLowRiskMaxOdd].
@@ -24,5 +34,35 @@ const int kMaxComboLegs = 20;
 const double kLowRiskMaxOdd = 1.50;
 const double kModerateMaxOdd = 2.50;
 
-/// Number of combo proposals to return.
+/// Number of combo proposals shown per "page" (and revealed by "Voir plus").
 const int kComboCount = 3;
+
+/// Max combos the generator produces up front, so "Voir plus" can reveal more
+/// without any extra work. Shown 3 at a time.
+const int kComboMaxResults = 30;
+
+/// Minimum edge over the market consensus to flag a selection as a "value bet"
+/// (0.03 == the offered price beats the consensus by 3%+).
+const double kValueEdgeThreshold = 0.03;
+
+/// Reference season for team/player stats and recent results on API-Football.
+/// The free plan only exposes seasons 2022–2024, so 2024 is the most recent
+/// data available. Bump once the plan/edition covers newer seasons.
+const int kStatsSeason = 2024;
+
+/// How many past head-to-head meetings to display.
+const int kH2hCount = 6;
+
+/// How many recent results (per team) to display.
+const int kRecentResultsCount = 5;
+
+// --- Affiliation (virtual, student-project only) ---------------------------
+// No real money: commissions are simulated euros, stored locally. In a real
+// product these would be paid by the bookmaker's affiliate program.
+
+/// Virtual commission credited to a referrer when someone signs up with their
+/// affiliate code.
+const double kReferralCommission = 5.0;
+
+/// Virtual welcome bonus credited to a new user who signed up with a code.
+const double kWelcomeBonus = 2.0;

@@ -12,7 +12,7 @@ class ErrorRetry extends StatelessWidget {
           children: [
             Text(message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.muted)),
+                style: TextStyle(color: AppColors.muted)),
             const SizedBox(height: 12),
             FilledButton(
                 onPressed: onRetry, child: const Text('Réessayer')),
