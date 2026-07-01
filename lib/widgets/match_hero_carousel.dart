@@ -110,7 +110,7 @@ class _HeroContent extends StatelessWidget {
       child: Column(
         children: [
           Text(match.competition.toUpperCase(),
-              style: const TextStyle(
+              style: TextStyle(
                   color: AppColors.muted,
                   fontWeight: FontWeight.w700,
                   fontSize: 10,

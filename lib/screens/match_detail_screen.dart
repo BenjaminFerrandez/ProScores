@@ -10,6 +10,7 @@ import '../utils/team_flags.dart';
 import '../widgets/error_retry.dart';
 import '../widgets/probability_bar.dart';
 import '../widgets/responsible_gaming_note.dart';
+import '../widgets/wobble_button.dart';
 import 'match_stats_screen.dart';
 
 class MatchDetailScreen extends ConsumerWidget {
