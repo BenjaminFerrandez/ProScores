@@ -7,8 +7,6 @@ import '../models/match_fixture.dart';
 import 'team_crest.dart';
 import 'time_chip.dart';
 
-/// Swipeable hero carousel featuring the next few upcoming matches, on a dark
-/// card with teal corner triangles and SVG dot indicators.
 class MatchHeroCarousel extends StatefulWidget {
   const MatchHeroCarousel({
     super.key,
@@ -42,7 +40,6 @@ class _MatchHeroCarouselState extends State<MatchHeroCarousel> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Corner triangles, sticking slightly out of the card.
           Positioned(
             top: -9,
             left: -9,

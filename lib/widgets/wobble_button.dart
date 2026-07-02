@@ -37,8 +37,6 @@ class _PressFeedbackState extends State<_PressFeedback> {
   }
 }
 
-/// Full-width call-to-action using the hand-drawn rectangle SVG. The lighter
-/// front face (and label) slides toward the shadow on press for a tactile feel.
 class WobbleButton extends StatelessWidget {
   const WobbleButton({
     super.key,
@@ -103,8 +101,6 @@ class WobbleButton extends StatelessWidget {
   }
 }
 
-/// Small square button using the square SVG background with a centered icon.
-/// The lighter front face + icon slide toward the shadow on press.
 class SquareIconButton extends StatelessWidget {
   const SquareIconButton({
     super.key,

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../config/assets.dart';
 
-/// Kickoff-time badge drawn on the hand-drawn "case temps" SVG background,
-/// with the time label centered on top.
 class TimeChip extends StatelessWidget {
   const TimeChip(this.time, {super.key, this.height = 26});
   final String time;

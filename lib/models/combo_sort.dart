@@ -1,4 +1,3 @@
-/// How to order generated combos before display.
 enum ComboSort {
   probabilityDesc, // most probable first (default)
   probabilityAsc, // least probable first

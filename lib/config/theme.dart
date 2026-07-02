@@ -32,7 +32,6 @@ const _lightPalette = _Palette(
 class AppColors {
   static _Palette _p = _darkPalette;
 
-  /// Switches the palette. Called by [buildAppTheme] for the active mode.
   static void apply(Brightness brightness) =>
       _p = brightness == Brightness.dark ? _darkPalette : _lightPalette;
 

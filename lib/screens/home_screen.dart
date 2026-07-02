@@ -99,8 +99,6 @@ class _HomeBodyState extends State<_HomeBody> {
     super.dispose();
   }
 
-  /// Ordered list of below-the-carousel widgets: match rows with the ad slot
-  /// inserted after the second match.
   List<Widget> _entries() {
     final entries = <Widget>[];
     for (var i = 0; i < widget.matches.length; i++) {
@@ -115,8 +113,7 @@ class _HomeBodyState extends State<_HomeBody> {
     return entries;
   }
 
-  /// Total entry count without building the widgets: one row per match, plus
-  /// the ad slot inserted after the second match.
+  // One row per match, plus the ad slot inserted after the second match.
   int get _totalEntries =>
       widget.matches.length + (widget.matches.length >= 2 ? 1 : 0);
 

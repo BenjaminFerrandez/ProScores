@@ -36,9 +36,9 @@ class ComboGenerator {
       };
 
   /// Builds combos whose product of odds lands within [tolerance] of the
-  /// target multiplier (target / stake). When [risk] is null, proposals are
+  /// target multiplier (target / stake). When [risks] is empty, proposals are
   /// generated across every risk band (low/medium/high odds) and merged;
-  /// otherwise only the chosen band is used. Results are ordered by [sort].
+  /// otherwise only the chosen bands are used. Results are ordered by [sort].
   static List<Combo> generate({
     required double stake,
     required double target,

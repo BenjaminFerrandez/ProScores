@@ -1,8 +1,6 @@
 import '../models/combo.dart';
 import '../models/market.dart';
 
-/// Turns a bet leg into a short, plain-French sentence explaining what has to
-/// happen for it to win.
 class BetExplainer {
   static String explain(ComboLeg leg) {
     final parts = leg.matchLabel.split(' - ');
@@ -47,7 +45,6 @@ class BetExplainer {
         : '$team gagne, fait nul, ou perd par $cushion but${cushion > 1 ? 's' : ''} maximum.';
   }
 
-  /// First unsigned number found (e.g. "+2.5" -> "2.5").
   static String _firstNumber(String s) {
     final m = RegExp(r'\d+(?:\.\d+)?').firstMatch(s);
     return m?.group(0) ?? s;

@@ -7,8 +7,6 @@ import '../models/match_fixture.dart';
 import '../utils/team_flags.dart';
 import 'time_chip.dart';
 
-/// Compact upcoming-match row: flags + team names, a full-height wavy divider,
-/// and the kickoff-time chip straddling the bottom edge of the card.
 class MatchRow extends StatelessWidget {
   const MatchRow({super.key, required this.match, required this.onTap});
   final MatchFixture match;
@@ -26,7 +24,6 @@ class MatchRow extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            // Full-height wavy divider, centered.
             Positioned.fill(
               child: Center(
                 child: SvgPicture.asset(Assets.dividerSquiggle,
@@ -61,7 +58,6 @@ class MatchRow extends StatelessWidget {
                 ],
               ),
             ),
-            // Kickoff time straddling the bottom edge of the card.
             Positioned(
               left: 0,
               right: 0,

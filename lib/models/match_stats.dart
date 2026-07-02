@@ -1,4 +1,3 @@
-/// One past meeting between the two teams.
 class H2HMatch {
   final DateTime date;
   final String homeName;
@@ -14,7 +13,8 @@ class H2HMatch {
   });
 }
 
-/// A recent finished match for one team, seen from that team's perspective.
+// A recent finished match, seen from that team's perspective (goalsFor is
+// the team's own score, home or away).
 class TeamResult {
   final DateTime date;
   final String opponent;
@@ -37,7 +37,6 @@ class TeamResult {
           : 'L';
 }
 
-/// A player in a team's squad, with their recent-season stats.
 class SquadPlayer {
   final String name;
   final String? position; // Goalkeeper / Defender / Midfielder / Attacker
@@ -51,7 +50,6 @@ class SquadPlayer {
   });
 }
 
-/// Everything we show for one side of a fixture.
 class TeamDossier {
   final int teamId;
   final String name;
@@ -65,7 +63,6 @@ class TeamDossier {
   });
 }
 
-/// Aggregated stats + history for a fixture's detail screen.
 class MatchStats {
   final TeamDossier home;
   final TeamDossier away;

@@ -3,8 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/auth_repository.dart';
 import '../models/user.dart';
 
-/// Holds the current session (null = logged out). Initializes the local store
-/// on first build.
 class AuthController extends AsyncNotifier<User?> {
   AuthRepository? _repo;
 

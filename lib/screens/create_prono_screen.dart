@@ -23,8 +23,8 @@ class CreatePronoScreen extends ConsumerStatefulWidget {
 }
 
 class _CreatePronoScreenState extends ConsumerState<CreatePronoScreen> {
-  final _stake = TextEditingController(text: '10');
-  final _target = TextEditingController(text: '25');
+  final _stake = TextEditingController(text: '5');
+  final _target = TextEditingController(text: '10');
   final Set<RiskLevel> _risks = {}; // empty = all
   final Set<String> _teams = {};
   ComboSort _sort = ComboSort.probabilityDesc;
@@ -115,7 +115,6 @@ class _CreatePronoScreenState extends ConsumerState<CreatePronoScreen> {
             ),
           const SizedBox(height: 20),
 
-          // ---- Collapsible filters, in a DA card ----
           _FilterPanel(
             open: _filtersOpen,
             activeCount: _activeFilterCount,
@@ -161,7 +160,6 @@ class _CreatePronoScreenState extends ConsumerState<CreatePronoScreen> {
   }
 }
 
-/// The two slanted (trapezoid) fields forming the stake / target box.
 class _StakeTargetBox extends StatelessWidget {
   const _StakeTargetBox(
       {required this.stake, required this.target, required this.onChanged});
@@ -263,7 +261,7 @@ class _TrapField extends StatelessWidget {
   }
 }
 
-/// Gradient risk bar (green -> red). More multiplier = more segments lit.
+// Green -> red gradient bar: more multiplier = more segments lit.
 class _RiskBar extends StatelessWidget {
   const _RiskBar({required this.multiplier});
   final double multiplier;
@@ -671,7 +669,7 @@ class _ComboCard extends StatelessWidget {
   }
 }
 
-/// One pick line: ball icon (result) or whistle icon (goals/other) + label.
+// One pick line: ball icon (result markets) or whistle icon (goals) + label.
 class _LegRow extends StatelessWidget {
   const _LegRow({required this.leg});
   final ComboLeg leg;

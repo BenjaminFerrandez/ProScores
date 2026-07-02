@@ -42,7 +42,6 @@ const Map<String, String> _teamIso = {
   'New Zealand': 'nz',
 };
 
-/// A team flag (rounded rectangle) with an initials fallback for unmapped teams.
 class TeamFlag extends StatelessWidget {
   const TeamFlag(this.teamName, {super.key, this.height = 28});
   final String teamName;

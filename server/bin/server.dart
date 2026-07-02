@@ -10,7 +10,7 @@ import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
 import 'package:sqlite3/open.dart';
 
-// --- Cache durations (seconds). 0 == never expires. -------------------------
+// Cache durations (seconds). 0 == never expires.
 const _forever = 0;
 const _ttlOdds = 300; // 5 min — odds move
 const _ttlTeamFixtures = 21600; // 6 h
@@ -43,8 +43,6 @@ Future<void> main() async {
   stdout.writeln('ProScores server on http://${server.address.host}:${server.port}'
       ' (cache: ${_cache.size} entries)');
 }
-
-// --- Handlers ---------------------------------------------------------------
 
 Response _health(Request r) => _json(
     jsonEncode({'status': 'ok', 'cacheEntries': _cache.size}), 200, 'LIVE');
@@ -82,8 +80,7 @@ Future<Response> _h2h(Request r) {
   return _cached('h2h:$home:$away', _ttlH2h, () => _up.headToHead(home, away));
 }
 
-// --- Aggregated "match stats" (one app call -> team ids + form + squads + h2h)
-
+// Aggregated "match stats": one app call -> team ids + form + squads + h2h.
 Future<Response> _matchStats(Request r) async {
   final home = (r.url.queryParameters['home'] ?? '').trim();
   final away = (r.url.queryParameters['away'] ?? '').trim();
@@ -117,7 +114,7 @@ Future<Response> _matchStats(Request r) async {
   }
 }
 
-/// Resolves a team name to its API-Football id (national preferred), cached.
+/// Resolves a team name to its API-Football id (national preferred).
 Future<int?> _resolveId(String name) async {
   final res = await _bodyCached('team:search:${name.toLowerCase()}', _forever,
       () => _up.teamSearch(name));
@@ -133,7 +130,7 @@ Future<int?> _resolveId(String name) async {
   return (national['team'] as Map<String, dynamic>)['id'] as int;
 }
 
-/// Every page of a team's players (raw page responses), each cached.
+/// Every page of a team's players.
 Future<List<dynamic>> _allPlayers(int teamId, int season) async {
   final pages = <dynamic>[];
   var page = 1;
@@ -152,8 +149,7 @@ Future<List<dynamic>> _allPlayers(int teamId, int season) async {
   return pages;
 }
 
-// --- CORS (so the Flutter web build in Chrome can call us) ------------------
-
+// CORS, so the Flutter web build in Chrome can call us.
 const _corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
@@ -167,8 +163,6 @@ Middleware _cors() => (Handler handler) => (Request request) async {
       final response = await handler(request);
       return response.change(headers: _corsHeaders);
     };
-
-// --- Cache-or-fetch core ----------------------------------------------------
 
 /// Returns the cached or freshly-fetched (status, body). Caches 200 responses.
 Future<({int status, String body})> _bodyCached(

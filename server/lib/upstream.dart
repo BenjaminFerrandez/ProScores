@@ -24,14 +24,11 @@ class Upstream {
     return UpstreamResponse(res.statusCode, res.body);
   }
 
-  // ---- The Odds API -------------------------------------------------------
-
   Future<UpstreamResponse> worldCupOdds() => _get(Uri.parse(
       '$_oddsBase/odds?regions=eu&markets=h2h,totals,spreads'
       '&oddsFormat=decimal&apiKey=$oddsApiKey'));
 
-  // ---- API-Football (key in a header) -------------------------------------
-
+  // API-Football wants the key in a header (The Odds API takes it as a query param).
   Map<String, String> get _footballHeaders =>
       {'x-apisports-key': footballApiKey};
 

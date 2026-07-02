@@ -10,7 +10,6 @@ class ApiException implements Exception {
   String toString() => 'ApiException: $message';
 }
 
-/// Everything the stats screen needs, fetched in a single backend call.
 typedef MatchStatsBundle = ({
   int homeId,
   int awayId,
@@ -25,7 +24,6 @@ abstract class FootballRepository {
   /// Team ids + form + squads + h2h for a fixture, in ONE backend call.
   Future<MatchStatsBundle> matchStats(String homeName, String awayName);
 
-  /// Crest/logo URL of a (national) team by name, or null.
   Future<String?> nationalTeamLogo(String teamName);
 }
 
@@ -55,8 +53,6 @@ class HttpFootballRepository implements FootballRepository {
   }
 
   static const _finished = {'FT', 'AET', 'PEN'};
-
-  // --- Parsing helpers ------------------------------------------------------
 
   static List<TeamResult> _parseResults(List<dynamic> response, int teamId) {
     final results = <TeamResult>[];
@@ -127,8 +123,6 @@ class HttpFootballRepository implements FootballRepository {
       ..sort((a, b) => b.date.compareTo(a.date));
     return matches.take(kH2hCount).toList();
   }
-
-  // --- Public API ----------------------------------------------------------
 
   @override
   Future<MatchStatsBundle> matchStats(String homeName, String awayName) async {

@@ -24,15 +24,12 @@ class ProScoresApp extends ConsumerWidget {
       title: 'ProScores',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(brightness),
-      // No cross-fade on theme change: everything switches in the same frame,
-      // so custom (AppColors) and Material widgets stay in sync.
       themeAnimationDuration: Duration.zero,
       home: const _AuthGate(),
     );
   }
 }
 
-/// Shows the auth screen when logged out, the app when logged in.
 class _AuthGate extends ConsumerWidget {
   const _AuthGate();
   @override

@@ -1,6 +1,5 @@
 import 'package:sqlite3/sqlite3.dart';
 
-/// A cached upstream response.
 class CachedResponse {
   final String body;
   final int status;

@@ -4,9 +4,6 @@ import 'probability_service.dart';
 import 'risk_classifier.dart';
 
 class MarketBuilder {
-  /// Builds the 1X2 market from bookmaker odds ordered [home, draw, away].
-  /// The displayed probability is the implied (margin-removed) bookmaker
-  /// probability.
   static Market build1x2({
     required List<double> bookmakerOdds,
     List<double>? consensus,
@@ -31,8 +28,6 @@ class MarketBuilder {
     return Market(type: MarketType.resultat1x2, selections: selections);
   }
 
-  /// Builds the totals (over/under) market from a single bookmaker line.
-  /// Probabilities are the margin-removed implied probabilities.
   static Market buildTotals({
     required double point,
     required double overOdd,
@@ -54,8 +49,6 @@ class MarketBuilder {
     ]);
   }
 
-  /// Builds the handicap (spreads) market. Home is shown as "1", away as "2",
-  /// each annotated with its handicap line.
   static Market buildSpreads({
     required double homePoint,
     required double homeOdd,
@@ -77,11 +70,9 @@ class MarketBuilder {
     ]);
   }
 
-  /// "2.5" -> "2.5", "3.0" -> "3".
   static String _formatPoint(double p) =>
       p == p.roundToDouble() ? p.toStringAsFixed(0) : p.toString();
 
-  /// Adds an explicit sign: 1.5 -> "+1.5", -1.5 -> "-1.5".
   static String _signed(double p) =>
       '${p > 0 ? '+' : ''}${_formatPoint(p)}';
 }

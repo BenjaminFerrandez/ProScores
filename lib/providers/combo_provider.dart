@@ -16,7 +16,6 @@ class ComboRequest {
   /// Optional team filter (team names). Empty = all teams.
   final Set<String> teams;
 
-  /// How to order the results.
   final ComboSort sort;
 
   const ComboRequest({
@@ -52,8 +51,6 @@ class ComboRequest {
       Object.hashAllUnordered(teams));
 }
 
-/// Unique team names that have an upcoming match, sorted alphabetically.
-/// Used to populate the team filter in the create-prono screen.
 final upcomingTeamsProvider = FutureProvider<List<String>>((ref) async {
   final fixtures = await ref.watch(worldCupFixturesProvider.future);
   final names = <String>{};
@@ -68,7 +65,6 @@ final upcomingTeamsProvider = FutureProvider<List<String>>((ref) async {
 final comboProvider =
     FutureProvider.family<List<Combo>, ComboRequest>((ref, req) async {
   final fixtures = await ref.watch(worldCupFixturesProvider.future);
-  // Build a candidate pool, honoring the optional team filter.
   final pool = <CandidateBet>[];
   for (final f in fixtures) {
     if (req.teams.isNotEmpty &&

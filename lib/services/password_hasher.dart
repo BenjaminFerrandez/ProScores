@@ -10,7 +10,6 @@ import 'package:crypto/crypto.dart';
 class PasswordHasher {
   static final _random = Random.secure();
 
-  /// A fresh random salt, base64url-encoded.
   static String generateSalt([int length = 16]) {
     final bytes = List<int>.generate(length, (_) => _random.nextInt(256));
     return base64Url.encode(bytes);

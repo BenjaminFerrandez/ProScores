@@ -3,20 +3,18 @@ import 'package:http/http.dart' as http;
 import '../config/constants.dart';
 import 'football_repository.dart' show ApiException;
 
-/// Over/under goals line for an event (a single, featured totals line).
 class TotalsOdds {
-  final double point; // e.g. 2.5
+  final double point;
   final double overOdd;
   final double underOdd;
   const TotalsOdds(
       {required this.point, required this.overOdd, required this.underOdd});
 }
 
-/// Asian/European handicap line for an event (home vs away).
 class SpreadsOdds {
-  final double homePoint; // e.g. -1.5
+  final double homePoint;
   final double homeOdd;
-  final double awayPoint; // e.g. +1.5
+  final double awayPoint;
   final double awayOdd;
   const SpreadsOdds({
     required this.homePoint,
@@ -26,7 +24,6 @@ class SpreadsOdds {
   });
 }
 
-/// A World Cup event as returned by The Odds API, with its featured markets.
 class OddsEvent {
   final String id;
   final DateTime commenceTime;
@@ -40,10 +37,7 @@ class OddsEvent {
   /// every bookmaker (margin removed). Used to flag value bets.
   final List<double>? h2hConsensus;
 
-  /// Over/under goals line. Null when no bookmaker offers it.
   final TotalsOdds? totals;
-
-  /// Handicap line. Null when no bookmaker offers it.
   final SpreadsOdds? spreads;
 
   const OddsEvent({
@@ -59,7 +53,6 @@ class OddsEvent {
 }
 
 abstract class OddsRepository {
-  /// Upcoming World Cup events with their featured odds, in a single call.
   Future<List<OddsEvent>> fetchWorldCupEvents();
 }
 
@@ -131,7 +124,6 @@ class HttpOddsRepository implements OddsRepository {
     return [avg[0] / t, avg[1] / t, avg[2] / t];
   }
 
-  /// Returns the outcomes of the first bookmaker offering [marketKey], or null.
   List<Map<String, dynamic>>? _firstMarketOutcomes(
       Map<String, dynamic> g, String marketKey) {
     final bookmakers =
@@ -148,7 +140,6 @@ class HttpOddsRepository implements OddsRepository {
     return null;
   }
 
-  /// Reads the first bookmaker's h2h market and returns [home, draw, away].
   List<double>? _extractH2h(
       Map<String, dynamic> g, String home, String away) {
     final outcomes = _firstMarketOutcomes(g, 'h2h');
@@ -167,7 +158,6 @@ class HttpOddsRepository implements OddsRepository {
     return [ph, pd, pa];
   }
 
-  /// Reads the first bookmaker's totals market (Over/Under on one line).
   TotalsOdds? _extractTotals(Map<String, dynamic> g) {
     final outcomes = _firstMarketOutcomes(g, 'totals');
     if (outcomes == null) return null;
@@ -188,7 +178,6 @@ class HttpOddsRepository implements OddsRepository {
     );
   }
 
-  /// Reads the first bookmaker's spreads market (handicap, named by team).
   SpreadsOdds? _extractSpreads(
       Map<String, dynamic> g, String home, String away) {
     final outcomes = _firstMarketOutcomes(g, 'spreads');

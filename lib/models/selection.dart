@@ -19,6 +19,5 @@ class Selection {
     this.valueEdge,
   });
 
-  /// True when the price offers a meaningful edge over the market consensus.
   bool get isValue => valueEdge != null && valueEdge! > 0;
 }

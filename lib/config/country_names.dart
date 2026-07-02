@@ -52,7 +52,6 @@ const Map<String, String> _frCountries = {
   'Uzbekistan': 'Ouzbékistan',
 };
 
-/// Returns the French country name, or the original if it isn't in the map.
 String frCountry(String englishName) =>
     _frCountries[englishName] ?? englishName;
 
@@ -60,7 +59,5 @@ final Map<String, String> _enCountries = {
   for (final e in _frCountries.entries) e.value: e.key,
 };
 
-/// Returns the English (Odds API) country name for a French one, or the input
-/// unchanged if it isn't a known French name.
 String enCountry(String frenchName) =>
     _enCountries[frenchName] ?? frenchName;
