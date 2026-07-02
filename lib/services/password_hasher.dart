@@ -22,14 +22,3 @@ class PasswordHasher {
   static bool verify(String password, String salt, String expectedHash) =>
       hash(password, salt) == expectedHash;
 }
-
-/// Generates short, human-friendly affiliate codes (no ambiguous chars).
-class AffiliateCode {
-  static const _chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  static final _random = Random.secure();
-
-  static String generate([int length = 6]) => List.generate(
-        length,
-        (_) => _chars[_random.nextInt(_chars.length)],
-      ).join();
-}

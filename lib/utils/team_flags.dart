@@ -1,10 +1,14 @@
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
+import '../config/country_names.dart';
 import '../config/theme.dart';
 
-/// Maps a national team name (as returned by The Odds API) to an
-/// ISO 3166-1 alpha-2 country code. Returns null when unknown.
-String? isoForTeam(String name) => _teamIso[name.trim()];
+/// Maps a national team name to an ISO 3166-1 alpha-2 country code. Accepts the
+/// English (Odds API) name or the French display name. Returns null if unknown.
+String? isoForTeam(String name) {
+  final n = name.trim();
+  return _teamIso[n] ?? _teamIso[enCountry(n)];
+}
 
 const Map<String, String> _teamIso = {
   // UEFA

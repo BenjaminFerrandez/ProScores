@@ -115,8 +115,13 @@ class _HomeBodyState extends State<_HomeBody> {
     return entries;
   }
 
+  /// Total entry count without building the widgets: one row per match, plus
+  /// the ad slot inserted after the second match.
+  int get _totalEntries =>
+      widget.matches.length + (widget.matches.length >= 2 ? 1 : 0);
+
   void _onScroll() {
-    final total = _entries().length;
+    final total = _totalEntries;
     if (!_loadingMore &&
         _visible < total &&
         _controller.position.pixels >=

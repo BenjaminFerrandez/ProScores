@@ -15,10 +15,4 @@ void main() {
     final h2 = PasswordHasher.hash('same', PasswordHasher.generateSalt());
     expect(h1, isNot(h2));
   });
-
-  test('affiliate codes are non-empty and reasonably random', () {
-    final codes = {for (var i = 0; i < 50; i++) AffiliateCode.generate()};
-    expect(codes.every((c) => c.length == 6), isTrue);
-    expect(codes.length, greaterThan(45)); // very few collisions expected
-  });
 }

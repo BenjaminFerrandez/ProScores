@@ -13,11 +13,9 @@ import 'package:sqlite3/open.dart';
 // --- Cache durations (seconds). 0 == never expires. -------------------------
 const _forever = 0;
 const _ttlOdds = 300; // 5 min — odds move
-const _ttlWorldCupFixtures = 3600; // 1 h
 const _ttlTeamFixtures = 21600; // 6 h
 const _ttlPlayers = 86400; // 1 day — squads rarely change
 const _ttlH2h = 604800; // 7 days — historic
-const _ttlPrediction = 21600; // 6 h
 
 late final Cache _cache;
 late final Upstream _up;
@@ -34,8 +32,6 @@ Future<void> main() async {
     ..get('/football/teams/<id|[0-9]+>/players', _teamPlayers)
     ..get('/football/teams/<id|[0-9]+>/fixtures', _teamFixtures)
     ..get('/football/h2h', _h2h)
-    ..get('/football/fixtures/<id|[0-9]+>/prediction', _prediction)
-    ..get('/football/worldcup/fixtures', _worldCupFixtures)
     ..get('/match/stats', _matchStats);
 
   final handler = const Pipeline()
@@ -43,7 +39,7 @@ Future<void> main() async {
       .addMiddleware(_cors())
       .addHandler(router.call);
 
-  final server = await io.serve(handler, InternetAddress.anyIPv4, 8080);
+  final server = await io.serve(handler, InternetAddress.anyIPv4, 8090);
   stdout.writeln('ProScores server on http://${server.address.host}:${server.port}'
       ' (cache: ${_cache.size} entries)');
 }
@@ -84,16 +80,6 @@ Future<Response> _h2h(Request r) {
     return Future.value(_bad('missing ?home & ?away'));
   }
   return _cached('h2h:$home:$away', _ttlH2h, () => _up.headToHead(home, away));
-}
-
-Future<Response> _prediction(Request r, String id) => _cached(
-    'prediction:$id', _ttlPrediction, () => _up.prediction(int.parse(id)));
-
-Future<Response> _worldCupFixtures(Request r) {
-  final season = _season(r);
-  final league = int.tryParse(r.url.queryParameters['league'] ?? '1') ?? 1;
-  return _cached('worldcup:fixtures:$league:$season', _ttlWorldCupFixtures,
-      () => _up.worldCupFixtures(league, season));
 }
 
 // --- Aggregated "match stats" (one app call -> team ids + form + squads + h2h)

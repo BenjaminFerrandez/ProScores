@@ -15,15 +15,4 @@ void main() {
     expect(p[0], closeTo(0.5, 1e-9));
     expect(p[1], closeTo(0.5, 1e-9));
   });
-
-  test('blend defaults to 50/50', () {
-    expect(ProbabilityService.blend(0.40, 0.60), closeTo(0.50, 1e-9));
-  });
-
-  test('blend respects custom weight', () {
-    expect(ProbabilityService.blend(0.40, 0.60, weightBookmaker: 1.0),
-        closeTo(0.40, 1e-9));
-    expect(ProbabilityService.blend(0.40, 0.60, weightBookmaker: 0.0),
-        closeTo(0.60, 1e-9));
-  });
 }

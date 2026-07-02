@@ -19,19 +19,12 @@ class BetExplainer {
           _ => 'Issue : $label.',
         };
       case MarketType.totalButs:
-      case MarketType.overUnder25:
         final line = _firstNumber(label);
         return label.startsWith('-')
             ? 'Moins de $line buts dans le match.'
             : 'Plus de $line buts dans le match.';
       case MarketType.handicap:
         return _explainHandicap(label, home, away);
-      case MarketType.doubleChance:
-        return 'Double chance : $label.';
-      case MarketType.btts:
-        return label.toLowerCase().startsWith('n')
-            ? 'Au moins une équipe ne marque pas.'
-            : 'Les deux équipes marquent au moins un but.';
     }
   }
 

@@ -7,9 +7,7 @@ class Team {
   /// Original/English name used for external lookups (API-Football search).
   /// Falls back to [name] when not provided.
   final String? searchName;
-  final String? flag;
-  const Team(
-      {required this.id, required this.name, this.searchName, this.flag});
+  const Team({required this.id, required this.name, this.searchName});
 
   String get lookupName => searchName ?? name;
 }

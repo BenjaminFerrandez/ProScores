@@ -18,10 +18,8 @@ class AuthController extends AsyncNotifier<User?> {
   Future<void> signUp({
     required String email,
     required String password,
-    String? referralCode,
   }) async {
-    final user = await _repo!
-        .signUp(email: email, password: password, referralCode: referralCode);
+    final user = await _repo!.signUp(email: email, password: password);
     state = AsyncData(user);
   }
 
@@ -34,13 +32,6 @@ class AuthController extends AsyncNotifier<User?> {
   Future<void> signOut() async {
     await _repo!.signOut();
     state = const AsyncData(null);
-  }
-
-  /// Accounts referred by the logged-in user (for the affiliate dashboard).
-  List<User> myReferrals() {
-    final me = state.value;
-    if (me == null || _repo == null) return const [];
-    return _repo!.referredBy(me.affiliateCode);
   }
 }
 

@@ -42,7 +42,7 @@ class ComboGenerator {
   static List<Combo> generate({
     required double stake,
     required double target,
-    RiskLevel? risk,
+    Set<RiskLevel> risks = const {},
     required List<CandidateBet> pool,
     ComboSort sort = ComboSort.probabilityDesc,
     double tolerance = kComboTolerance,
@@ -51,9 +51,10 @@ class ComboGenerator {
   }) {
     if (stake <= 0 || target <= stake) return [];
 
-    final bands = risk != null
-        ? [risk]
-        : const [RiskLevel.peuRisque, RiskLevel.modere, RiskLevel.risque];
+    // Empty = every band; otherwise only the chosen ones.
+    final bands = risks.isEmpty
+        ? const [RiskLevel.peuRisque, RiskLevel.modere, RiskLevel.risque]
+        : risks.toList();
 
     final merged = <Combo>[];
     for (final band in bands) {

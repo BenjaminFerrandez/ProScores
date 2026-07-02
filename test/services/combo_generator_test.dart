@@ -23,7 +23,7 @@ void main() {
     final combos = ComboGenerator.generate(
       stake: 10,
       target: 100,
-      risk: RiskLevel.peuRisque,
+      risks: {RiskLevel.peuRisque},
       pool: pool,
     );
     expect(combos, isNotEmpty);
@@ -40,7 +40,7 @@ void main() {
     final combos = ComboGenerator.generate(
       stake: 10,
       target: 500,
-      risk: RiskLevel.peuRisque,
+      risks: {RiskLevel.peuRisque},
       pool: pool,
     );
     expect(combos, isNotEmpty);
@@ -59,7 +59,7 @@ void main() {
     final combos = ComboGenerator.generate(
       stake: 10,
       target: 20,
-      risk: RiskLevel.peuRisque,
+      risks: {RiskLevel.peuRisque},
       pool: pool,
     );
     expect(combos, isNotEmpty);
@@ -77,7 +77,7 @@ void main() {
     final combos = ComboGenerator.generate(
       stake: 10,
       target: 20,
-      risk: RiskLevel.peuRisque,
+      risks: {RiskLevel.peuRisque},
       pool: pool,
     );
     expect(combos, isEmpty);
@@ -92,7 +92,7 @@ void main() {
     final combos = ComboGenerator.generate(
       stake: 10,
       target: 20, // ×2 ~ 1.40*1.45 = 2.03
-      risk: RiskLevel.peuRisque,
+      risks: {RiskLevel.peuRisque},
       pool: pool,
     );
     expect(combos, isNotEmpty);
@@ -113,7 +113,7 @@ void main() {
     final combos = ComboGenerator.generate(
       stake: 10,
       target: 37, // ×3.74 — only reachable by combining the two legs
-      risk: null,
+      risks: const {},
       pool: pool,
     );
     expect(combos, isEmpty);
@@ -128,7 +128,7 @@ void main() {
     final combos = ComboGenerator.generate(
       stake: 10,
       target: 50,
-      risk: RiskLevel.risque,
+      risks: {RiskLevel.risque},
       pool: pool,
     );
     expect(combos, isEmpty);
@@ -138,7 +138,7 @@ void main() {
     final pool = [bet(1, 'A', 1.20, 0.80)];
     expect(
       ComboGenerator.generate(
-          stake: 10, target: 10, risk: RiskLevel.peuRisque, pool: pool),
+          stake: 10, target: 10, risks: {RiskLevel.peuRisque}, pool: pool),
       isEmpty,
     );
   });
@@ -153,7 +153,7 @@ void main() {
     final combos = ComboGenerator.generate(
       stake: 10,
       target: 20,
-      risk: RiskLevel.peuRisque,
+      risks: {RiskLevel.peuRisque},
       pool: pool,
       maxResults: 2,
     );
@@ -175,7 +175,7 @@ void main() {
     final all = ComboGenerator.generate(
       stake: 10,
       target: 20,
-      risk: null, // no filter
+      risks: const {}, // no filter
       pool: pool,
     );
     // We should get proposals from more than one band (low-odds 2-leg + the
@@ -195,7 +195,7 @@ void main() {
     final byPayout = ComboGenerator.generate(
       stake: 10,
       target: 20,
-      risk: null,
+      risks: const {},
       pool: pool,
       sort: ComboSort.payoutDesc,
     );
@@ -206,7 +206,7 @@ void main() {
     final byProbAsc = ComboGenerator.generate(
       stake: 10,
       target: 20,
-      risk: null,
+      risks: const {},
       pool: pool,
       sort: ComboSort.probabilityAsc,
     );

@@ -13,4 +13,10 @@ class Assets {
   static const carouselDotEmpty = 'assets/buttons/carrousel_dot_empty.svg';
   static const triangleTopMatch = 'assets/buttons/triangle_top_match.svg';
   static const dividerSquiggle = 'assets/buttons/divider_squiggle.svg';
+
+  // "Crée ton prono" screen.
+  static const boxStake = 'assets/buttons/boite_mise.svg';
+  static const boxTarget = 'assets/buttons/boite_objectif.svg';
+  static const iconBall = 'assets/icons/ballon.png';
+  static const iconWhistle = 'assets/icons/siflet.png';
 }

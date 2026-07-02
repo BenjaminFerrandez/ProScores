@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/constants.dart';
-import '../models/match_fixture.dart';
 import '../models/match_stats.dart';
-import '../models/prediction.dart';
-import '../models/team.dart';
 
 class ApiException implements Exception {
   final String message;
@@ -25,23 +22,11 @@ typedef MatchStatsBundle = ({
 });
 
 abstract class FootballRepository {
-  Future<List<MatchFixture>> upcomingWorldCupFixtures();
-  Future<Prediction> predictionFor(int fixtureId);
-
-  /// Resolves a (national) team name to its API-Football id, or null.
-  Future<int?> resolveTeamId(String name);
-
-  /// Recent finished results for a team, most recent first.
-  Future<List<TeamResult>> recentResults(int teamId);
-
-  /// Squad of a team with each player's recent-season position and stats.
-  Future<List<SquadPlayer>> squad(int teamId);
-
-  /// Past meetings between two teams, most recent first.
-  Future<List<H2HMatch>> headToHead(int homeId, int awayId);
-
   /// Team ids + form + squads + h2h for a fixture, in ONE backend call.
   Future<MatchStatsBundle> matchStats(String homeName, String awayName);
+
+  /// Crest/logo URL of a (national) team by name, or null.
+  Future<String?> nationalTeamLogo(String teamName);
 }
 
 class HttpFootballRepository implements FootballRepository {
@@ -53,8 +38,9 @@ class HttpFootballRepository implements FootballRepository {
 
   @override
   Future<String?> nationalTeamLogo(String teamName) async {
-    final uri = Uri.parse('$_base/teams?search=${Uri.encodeQueryComponent(teamName)}');
-    final res = await client.get(uri, headers: _headers);
+    final uri = Uri.parse(
+        '$_base/teams/search?name=${Uri.encodeQueryComponent(teamName)}');
+    final res = await client.get(uri);
     if (res.statusCode != 200) return null;
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     final list = (data['response'] as List?)?.cast<Map<String, dynamic>>() ??
@@ -68,85 +54,9 @@ class HttpFootballRepository implements FootballRepository {
     return (match['team'] as Map<String, dynamic>)['logo'] as String?;
   }
 
-  @override
-  Future<List<MatchFixture>> upcomingWorldCupFixtures() async {
-    final uri = Uri.parse(
-        '$_base/worldcup/fixtures?league=$kWorldCupLeagueId&season=$kSeason');
-    final res = await client.get(uri);
-    if (res.statusCode != 200) {
-      throw ApiException('fixtures HTTP ${res.statusCode}');
-    }
-    final data = jsonDecode(res.body) as Map<String, dynamic>;
-    final list = (data['response'] as List).cast<Map<String, dynamic>>();
-    return list.map(_parseFixture).toList();
-  }
-
-  MatchFixture _parseFixture(Map<String, dynamic> j) {
-    final fixture = j['fixture'] as Map<String, dynamic>;
-    final league = j['league'] as Map<String, dynamic>;
-    final teams = j['teams'] as Map<String, dynamic>;
-    final home = teams['home'] as Map<String, dynamic>;
-    final away = teams['away'] as Map<String, dynamic>;
-    return MatchFixture(
-      id: fixture['id'] as int,
-      competition: league['name'] as String? ?? 'World Cup',
-      group: league['round'] as String?,
-      kickoff: DateTime.parse(fixture['date'] as String),
-      home: Team(
-          id: home['id'] as int,
-          name: home['name'] as String,
-          flag: home['logo'] as String?),
-      away: Team(
-          id: away['id'] as int,
-          name: away['name'] as String,
-          flag: away['logo'] as String?),
-    );
-  }
-
-  @override
-  Future<Prediction> predictionFor(int fixtureId) async {
-    final uri = Uri.parse('$_base/fixtures/$fixtureId/prediction');
-    final res = await client.get(uri);
-    if (res.statusCode != 200) {
-      throw ApiException('predictions HTTP ${res.statusCode}');
-    }
-    final data = jsonDecode(res.body) as Map<String, dynamic>;
-    final response = (data['response'] as List).cast<Map<String, dynamic>>();
-    if (response.isEmpty) throw ApiException('no prediction');
-    final percent = (response.first['predictions']
-        as Map<String, dynamic>)['percent'] as Map<String, dynamic>;
-    double pct(String k) =>
-        double.parse((percent[k] as String).replaceAll('%', '')) / 100.0;
-    return Prediction(
-        homeProb: pct('home'), drawProb: pct('draw'), awayProb: pct('away'));
-  }
-
-  Future<Map<String, dynamic>> _getJson(Uri uri, String what) async {
-    final res = await client.get(uri);
-    if (res.statusCode != 200) {
-      throw ApiException('$what HTTP ${res.statusCode}');
-    }
-    return jsonDecode(res.body) as Map<String, dynamic>;
-  }
-
-  @override
-  Future<int?> resolveTeamId(String name) async {
-    final uri =
-        Uri.parse('$_base/teams/search?name=${Uri.encodeQueryComponent(name)}');
-    final data = await _getJson(uri, 'teams');
-    final list = (data['response'] as List).cast<Map<String, dynamic>>();
-    if (list.isEmpty) return null;
-    // Prefer a national team when several share the name.
-    final national = list.firstWhere(
-      (e) => (e['team'] as Map<String, dynamic>)['national'] == true,
-      orElse: () => list.first,
-    );
-    return (national['team'] as Map<String, dynamic>)['id'] as int;
-  }
-
   static const _finished = {'FT', 'AET', 'PEN'};
 
-  // --- Parsing helpers (shared by per-resource and aggregated calls) -------
+  // --- Parsing helpers ------------------------------------------------------
 
   static List<TeamResult> _parseResults(List<dynamic> response, int teamId) {
     final results = <TeamResult>[];
@@ -219,40 +129,6 @@ class HttpFootballRepository implements FootballRepository {
   }
 
   // --- Public API ----------------------------------------------------------
-
-  @override
-  Future<List<TeamResult>> recentResults(int teamId) async {
-    final uri =
-        Uri.parse('$_base/teams/$teamId/fixtures?season=$kStatsSeason');
-    final data = await _getJson(uri, 'fixtures');
-    return _parseResults(data['response'] as List, teamId);
-  }
-
-  @override
-  Future<List<SquadPlayer>> squad(int teamId) async {
-    final players = <SquadPlayer>[];
-    var page = 1;
-    var totalPages = 1;
-    do {
-      final uri = Uri.parse(
-          '$_base/teams/$teamId/players?season=$kStatsSeason&page=$page');
-      final data = await _getJson(uri, 'players');
-      totalPages =
-          ((data['paging'] as Map<String, dynamic>?)?['total'] as num?)
-                  ?.toInt() ??
-              1;
-      players.addAll(_parseSquadPage(data['response'] as List));
-      page++;
-    } while (page <= totalPages && page <= 6); // safety cap
-    return players;
-  }
-
-  @override
-  Future<List<H2HMatch>> headToHead(int homeId, int awayId) async {
-    final uri = Uri.parse('$_base/h2h?home=$homeId&away=$awayId');
-    final data = await _getJson(uri, 'head to head');
-    return _parseH2h(data['response'] as List);
-  }
 
   @override
   Future<MatchStatsBundle> matchStats(String homeName, String awayName) async {

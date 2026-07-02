@@ -10,8 +10,8 @@ class ComboRequest {
   final double stake;
   final double target;
 
-  /// Optional risk filter. Null = all risk bands.
-  final RiskLevel? risk;
+  /// Optional risk filter. Empty = all risk bands.
+  final Set<RiskLevel> risks;
 
   /// Optional team filter (team names). Empty = all teams.
   final Set<String> teams;
@@ -22,7 +22,7 @@ class ComboRequest {
   const ComboRequest({
     required this.stake,
     required this.target,
-    this.risk,
+    this.risks = const {},
     this.teams = const {},
     this.sort = ComboSort.probabilityDesc,
   });
@@ -30,7 +30,7 @@ class ComboRequest {
   ComboRequest copyWith({ComboSort? sort}) => ComboRequest(
         stake: stake,
         target: target,
-        risk: risk,
+        risks: risks,
         teams: teams,
         sort: sort ?? this.sort,
       );
@@ -40,15 +40,15 @@ class ComboRequest {
       other is ComboRequest &&
       other.stake == stake &&
       other.target == target &&
-      other.risk == risk &&
       other.sort == sort &&
-      _sameTeams(other.teams);
+      _sameSet(other.risks, risks) &&
+      _sameSet(other.teams, teams);
 
-  bool _sameTeams(Set<String> o) =>
-      o.length == teams.length && o.containsAll(teams);
+  bool _sameSet(Set o, Set s) => o.length == s.length && o.containsAll(s);
 
   @override
-  int get hashCode => Object.hash(stake, target, risk, sort,
+  int get hashCode => Object.hash(stake, target, sort,
+      Object.hashAllUnordered(risks),
       Object.hashAllUnordered(teams));
 }
 
@@ -89,7 +89,7 @@ final comboProvider =
   return ComboGenerator.generate(
     stake: req.stake,
     target: req.target,
-    risk: req.risk,
+    risks: req.risks,
     pool: pool,
     sort: req.sort,
     maxResults: kComboMaxResults,

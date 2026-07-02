@@ -40,6 +40,8 @@ dependencies:
   intl: ^0.20.2
   flutter_svg: ^2.2.3
   country_flags: ^4.1.2
+  shared_preferences: ^2.3.2
+  crypto: ^3.0.5
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +69,7 @@ flutter:
   assets:
     - assets/logo/
     - assets/buttons/
+    - assets/icons/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

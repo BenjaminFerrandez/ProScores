@@ -125,8 +125,8 @@ class _HeroContent extends StatelessWidget {
           ),
           const Spacer(),
           Text(when,
-              style: const TextStyle(
-                  color: Colors.white,
+              style: TextStyle(
+                  color: AppColors.light,
                   fontWeight: FontWeight.w600,
                   fontSize: 12)),
           const SizedBox(height: 8),
@@ -149,8 +149,8 @@ class _Side extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-                color: Colors.white,
+            style: TextStyle(
+                color: AppColors.light,
                 fontWeight: FontWeight.w700,
                 fontSize: 14)),
       ],

@@ -21,12 +21,4 @@ class Selection {
 
   /// True when the price offers a meaningful edge over the market consensus.
   bool get isValue => valueEdge != null && valueEdge! > 0;
-
-  Selection copyWith({RiskLevel? risk}) => Selection(
-        label: label,
-        odd: odd,
-        adjustedProbability: adjustedProbability,
-        risk: risk ?? this.risk,
-        valueEdge: valueEdge,
-      );
 }

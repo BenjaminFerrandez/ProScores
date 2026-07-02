@@ -16,13 +16,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   final _email = TextEditingController();
   final _password = TextEditingController();
-  final _referral = TextEditingController();
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
-    _referral.dispose();
     super.dispose();
   }
 
@@ -34,11 +32,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     try {
       final auth = ref.read(authControllerProvider.notifier);
       if (_isSignUp) {
-        await auth.signUp(
-          email: _email.text,
-          password: _password.text,
-          referralCode: _referral.text,
-        );
+        await auth.signUp(email: _email.text, password: _password.text);
       } else {
         await auth.signIn(email: _email.text, password: _password.text);
       }
@@ -84,12 +78,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               _Field(label: 'E-mail', controller: _email, email: true),
               const SizedBox(height: 14),
               _Field(label: 'Mot de passe', controller: _password, obscure: true),
-              if (_isSignUp) ...[
-                const SizedBox(height: 14),
-                _Field(
-                    label: 'Code de parrainage (optionnel)',
-                    controller: _referral),
-              ],
               if (_error != null) ...[
                 const SizedBox(height: 14),
                 Text(_error!,

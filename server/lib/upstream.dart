@@ -49,10 +49,4 @@ class Upstream {
 
   Future<UpstreamResponse> headToHead(int home, int away) =>
       _football('/fixtures/headtohead?h2h=$home-$away');
-
-  Future<UpstreamResponse> prediction(int fixtureId) =>
-      _football('/predictions?fixture=$fixtureId');
-
-  Future<UpstreamResponse> worldCupFixtures(int league, int season) =>
-      _football('/fixtures?league=$league&season=$season&next=20');
 }

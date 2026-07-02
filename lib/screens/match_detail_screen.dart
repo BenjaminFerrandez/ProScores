@@ -59,13 +59,9 @@ class MatchDetailScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(match.home.name,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 16)),
+                _HeaderTeam(name: match.home.name),
                 Text('VS', style: TextStyle(color: AppColors.muted)),
-                Text(match.away.name,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 16)),
+                _HeaderTeam(name: match.away.name),
               ],
             ),
             const SizedBox(height: 20),

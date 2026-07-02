@@ -1,29 +1,21 @@
 import '../models/market.dart';
-import '../models/prediction.dart';
 import '../models/selection.dart';
 import 'probability_service.dart';
 import 'risk_classifier.dart';
 
 class MarketBuilder {
-  /// Builds the 1X2 market from normalized bookmaker odds, optionally blended
-  /// with a model [prediction]. [bookmakerOdds] is ordered [home, draw, away].
-  /// When [prediction] is null the displayed probability is the implied
-  /// (margin-removed) bookmaker probability alone.
+  /// Builds the 1X2 market from bookmaker odds ordered [home, draw, away].
+  /// The displayed probability is the implied (margin-removed) bookmaker
+  /// probability.
   static Market build1x2({
     required List<double> bookmakerOdds,
-    Prediction? prediction,
     List<double>? consensus,
   }) {
     final implied = ProbabilityService.normalizeImplied(bookmakerOdds);
-    final modelProbs = prediction == null
-        ? null
-        : [prediction.homeProb, prediction.drawProb, prediction.awayProb];
     final labels = ['1', 'N', '2'];
     final selections = <Selection>[];
     for (var i = 0; i < 3; i++) {
-      final p = modelProbs == null
-          ? implied[i]
-          : ProbabilityService.blend(implied[i], modelProbs[i]);
+      final p = implied[i];
       // Value vs the market consensus: odd * consensusProb - 1.
       final edge = consensus != null && consensus.length == 3
           ? bookmakerOdds[i] * consensus[i] - 1

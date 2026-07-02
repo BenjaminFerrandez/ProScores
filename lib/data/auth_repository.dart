@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../config/constants.dart';
 import '../models/user.dart';
 import '../services/password_hasher.dart';
 
@@ -43,28 +42,9 @@ class AuthRepository {
     return null;
   }
 
-  /// People who signed up with [affiliateCode], newest first.
-  List<User> referredBy(String affiliateCode) {
-    final code = affiliateCode.toUpperCase();
-    final list =
-        _allUsers().where((u) => u.referredByCode == code).toList();
-    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return list;
-  }
-
-  String _uniqueAffiliateCode(List<User> users) {
-    final taken = users.map((u) => u.affiliateCode).toSet();
-    String code;
-    do {
-      code = AffiliateCode.generate();
-    } while (taken.contains(code));
-    return code;
-  }
-
   Future<User> signUp({
     required String email,
     required String password,
-    String? referralCode,
   }) async {
     final normalized = _normalize(email);
     if (normalized.isEmpty || !normalized.contains('@')) {
@@ -79,44 +59,16 @@ class AuthRepository {
       throw AuthException('Un compte existe déjà avec cet e-mail.');
     }
 
-    // Apply referral, if a code was provided.
-    User? referrer;
-    final code = referralCode?.trim().toUpperCase();
-    if (code != null && code.isNotEmpty) {
-      referrer = users.cast<User?>().firstWhere(
-            (u) => u!.affiliateCode == code,
-            orElse: () => null,
-          );
-      if (referrer == null) {
-        throw AuthException('Code de parrainage invalide.');
-      }
-    }
-
     final salt = PasswordHasher.generateSalt();
     final newUser = User(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       email: normalized,
       passwordHash: PasswordHasher.hash(password, salt),
       salt: salt,
-      affiliateCode: _uniqueAffiliateCode(users),
-      referredByCode: referrer?.affiliateCode,
-      commissionBalance: referrer == null ? 0 : kWelcomeBonus,
       createdAt: DateTime.now(),
     );
 
-    final updated = [...users, newUser];
-    if (referrer != null) {
-      // Credit the referrer's commission.
-      for (var i = 0; i < updated.length; i++) {
-        if (updated[i].id == referrer.id) {
-          updated[i] = updated[i].copyWith(
-              commissionBalance:
-                  updated[i].commissionBalance + kReferralCommission);
-        }
-      }
-    }
-
-    await _saveUsers(updated);
+    await _saveUsers([...users, newUser]);
     await _prefs.setString(_sessionKey, newUser.id);
     return newUser;
   }

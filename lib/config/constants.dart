@@ -1,20 +1,11 @@
 /// Base URL of our backend proxy (server/). The app never talks to The Odds
 /// API or API-Football directly — the server holds the keys and caches data.
 ///
-/// - Desktop / web / iOS simulator: http://localhost:8080
-/// - Android emulator: http://10.0.2.2:8080 (the emulator's alias for the host)
-/// - Physical device: `http://<your-machine-LAN-IP>:8080`
-const String kServerBaseUrl = 'http://localhost:8080';
-
-/// API-Football league id for the World Cup. Confirm at integration time.
-const int kWorldCupLeagueId = 1;
-
-/// Season year used for API-Football fixture queries.
-const int kSeason = 2026;
-
-/// Weight given to the bookmaker implied probability vs the model
-/// probability when blending. 0.5 == 50/50. Tune after observing results.
-const double kBookmakerWeight = 0.5;
+/// - Desktop / web / iOS simulator: http://localhost:8090
+/// - Android emulator: http://10.0.2.2:8090 (the emulator's alias for the host)
+/// - Physical device: `http://<your-machine-LAN-IP>:8090`
+/// (Port 8090 because 8080 is used by another local service on this machine.)
+const String kServerBaseUrl = 'http://localhost:8090';
 
 /// Acceptable relative gap between a combo's total odds and the target
 /// multiplier (0.10 == ±10%).
@@ -56,13 +47,3 @@ const int kH2hCount = 6;
 /// How many recent results (per team) to display.
 const int kRecentResultsCount = 5;
 
-// --- Affiliation (virtual, student-project only) ---------------------------
-// No real money: commissions are simulated euros, stored locally. In a real
-// product these would be paid by the bookmaker's affiliate program.
-
-/// Virtual commission credited to a referrer when someone signs up with their
-/// affiliate code.
-const double kReferralCommission = 5.0;
-
-/// Virtual welcome bonus credited to a new user who signed up with a code.
-const double kWelcomeBonus = 2.0;

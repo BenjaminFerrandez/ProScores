@@ -11,8 +11,9 @@ void main() {
   });
 
   test('MarketType labels are French', () {
-    expect(MarketType.btts.label, 'Les deux équipes marquent');
-    expect(MarketType.overUnder25.label, 'Plus / moins de 2.5 buts');
+    expect(MarketType.resultat1x2.label, 'Vainqueur du match');
+    expect(MarketType.totalButs.label, 'Plus / moins de buts');
+    expect(MarketType.handicap.label, 'Handicap');
   });
 
   test('Selection stores odd and probability', () {
